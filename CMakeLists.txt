@@ -15,20 +15,30 @@ add_compile_definitions(UNICODE)
 find_package(OpenGL REQUIRED)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW lib only")
 set(GLFW_INSTALL OFF CACHE BOOL "GLFW lib only")
+option(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
+option(ASSIMP_BUILD_SAMPLES OFF)
+option(ASSIMP_BUILD_TESTS OFF)
+option(BUILD_SHARED_LIBS OFF)
 add_library(Rendering-Application-Core STATIC 
 	${RENDERING_APPLICATION_CORE_SOURCE_FILES}
 	${RENDERING_APPLICATION_CORE_HEADER_FILES}
 	${GLFW_SOURCE_FILES})
 add_subdirectory(./Dependencies/glfw)
 add_subdirectory(./Dependencies/glew-cmake)
+add_subdirectory(./Dependencies/assimp)
 target_link_libraries(Rendering-Application-Core PUBLIC
 	${OPENGL_LIBRARIES}
 	glfw
-	libglew_static)
+	libglew_static
+	assimp)
 target_include_directories(Rendering-Application-Core PUBLIC
 	${OPENGL_INCLUDE_DIRS}
 	./Dependencies/glfw/include
-	./Dependencies/glew-cmake/include)
+	./Dependencies/glew-cmake/include
+	./Dependencies/assimp/include
+	./Dependencies/stb/include
+	./Dependencies/entt/src
+	./Dependencies/glm)
 
 #####################################################
 # SETUP RENDERING-APPLICATION-EXAMPLE
