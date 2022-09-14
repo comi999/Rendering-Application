@@ -1,20 +1,21 @@
 #pragma once
 #include <string>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <map>
 #include <glm/glm.hpp>
 
 #include "Pointer.hpp"
 
+class GLFWwindow;
+
 class Window
 {
-private:
-
-	Window();
-
 public:
 
-	static Shared< Window > Create( const char* a_Title, glm::uvec2 a_Size );
+	Window( const char* a_Title, glm::uvec2 a_Size );
+	~Window();
+	operator GLFWwindow* () const { return m_Window; }
+	glm::uvec2 GetSize() const { return m_Size; }
+	bool ShouldClose() const;
 	static void SetActive( Window* a_Window );
 	static Window* GetActive();
 
@@ -24,5 +25,6 @@ private:
 	glm::uvec2  m_Size;
 	std::string m_Title;
 
-	static Window* s_ActiveWindow;
+	static Window*                          s_ActiveWindow;
+	static std::map< GLFWwindow*, Window* > s_Windows;
 };

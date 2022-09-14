@@ -6,7 +6,7 @@ class RenderingApplication : public Application
 {
 public:
 
-	RenderingApplication( Window* a_Window );
+	RenderingApplication( const char* a_Title, glm::uvec2 a_Size );
 
 protected:
 
@@ -14,4 +14,7 @@ protected:
 	void OnTick( float a_DeltaTime ) override;
 	void OnStop() override;
 
+private:
+
+	Object m_Root;
 };
