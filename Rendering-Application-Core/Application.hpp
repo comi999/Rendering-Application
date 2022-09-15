@@ -5,6 +5,10 @@
 #include "Window.hpp"
 #include "Object.hpp"
 
+class Camera;
+
+
+
 class Application
 {
 private:
@@ -25,6 +29,30 @@ private:
 		}
 	};
 
+	template < typename T >
+	struct HasOnCreate
+	{
+		template < typename U > static char test( decltype( &U::OnCreate ) );
+		template < typename U > static long test( ... );
+		static constexpr bool Value = sizeof( test< T >( 0 ) ) == sizeof( char );
+	};
+
+	template < typename T >
+	struct HasOnDestroy
+	{
+		template < typename U > static char test( decltype( &U::OnDestroy ) );
+		template < typename U > static long test( ... );
+		static constexpr bool Value = sizeof( test< T >( 0 ) ) == sizeof( char );
+	};
+
+	template < typename T >
+	struct HasOnTick
+	{
+		template < typename U > static char test( decltype( &U::OnTick ) );
+		template < typename U > static long test( ... );
+		static constexpr bool Value = sizeof( test< T >( 0 ) ) == sizeof( char );
+	};
+
 public:
 
 	typedef void( *Updater )( Application*, float );
@@ -34,9 +62,11 @@ public:
 	bool Running() const;
 	void Run();
 	void Quit();
-	const Window& GetWindow() const { return m_Window; }
+	const Window* GetWindow() const { return m_Window; }
 	Object Create();
 	void Destroy( Object a_Object );
+	Camera* GetMainCamera();
+	void SetMainCamera( Camera* a_Camera );
 
 	template < typename T >
 	T* AddComponent( Object a_Object );
@@ -46,6 +76,9 @@ public:
 
 	template < typename T >
 	void DestroyComponent( Object a_Object );
+
+	template < typename T, typename Func >
+	void PatchComponents( Func a_Patcher );
 
 protected:
 
@@ -60,7 +93,8 @@ private:
 	void UpdateAllComponents( float a_DeltaTime );
 
 	bool                       m_Running;
-	Window                     m_Window;
+	Window*                    m_Window;
+	Object                     m_MainCamera;
 	entt::registry             m_Registry;
 	std::vector< Updater >     m_Updaters;
 };
@@ -70,7 +104,14 @@ T* Application::AddComponent( Object a_Object )
 {
 	AssureUpdater< T >();
 	T* New = &m_Registry.emplace_or_replace< T >( a_Object );
-	New->OnCreate( this, a_Object );
+	New->m_Application = this;
+	New->m_Object = a_Object;
+
+	if constexpr ( HasOnCreate< T >::Value )
+	{
+		New->OnCreate();
+	}
+
 	return New;
 }
 
@@ -84,17 +125,31 @@ template < typename T >
 void Application::DestroyComponent( Object a_Object )
 {
 	T* Old = m_Registry.try_get< T >( a_Object );
-	Old->OnDestroy( this, a_Object );
+
+	if constexpr ( HasOnDestroy< T >::Value )
+	{
+		Old->OnDestroy();
+	}
+
 	m_Registry.destroy( a_Object );
+}
+
+template < typename T, typename Func >
+void Application::PatchComponents( Func a_Patcher )
+{
+	m_Registry.view< T >().each( a_Patcher );
 }
 
 template < typename T >
 void Application::UpdateComponents( Application* a_Application, float a_DeltaTime )
 {
-	a_Application->m_Registry.view< T >().each( [&]( Object a_Object, T& a_Component )
+	if constexpr ( HasOnTick< T >::Value )
 	{
-		a_Component.OnTick( a_Application, a_Object, a_DeltaTime );
-	} );
+		a_Application->m_Registry.view< T >().each( [&]( T& a_Component )
+		{
+			a_Component.OnTick( a_DeltaTime );
+		} );
+	}
 }
 
 template < typename T >

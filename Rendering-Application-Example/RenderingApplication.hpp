@@ -17,4 +17,5 @@ protected:
 private:
 
 	Object m_Root;
+	Object m_CameraObject;
 };

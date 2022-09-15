@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(Rendering-Application)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+file(COPY ${PROJECT_SOURCE_DIR}/Resources DESTINATION ${PROJECT_BINARY_DIR})
 
 #####################################################
 # SETUP RENDERING-APPLICATION-CORE

@@ -1,23 +1,28 @@
 #include "Renderer.hpp"
+#include "Rendering.hpp"
+#include "Application.hpp"
+#include "Transform.hpp"
 
-#include <iostream>
+void Renderer::OnCreate() { }
 
-void Renderer::OnCreate( Application* a_Application, Object a_Object )
-{
-
-}
-
-void Renderer::OnTick( Application* a_Application, Object a_Object, float a_DeltaTime )
+void Renderer::OnTick( float a_DeltaTime )
 {
 	
 }
 
-void Renderer::OnDestroy( Application* a_Application, Object a_Object )
+void Renderer::OnDestroy()
 {
 
 }
 
-void Renderer::Draw()
+void Renderer::Submit()
 {
-	// Submit draw commands to Renderering
+	Application* ThisApplication = GetApplication();
+	Transform* ThisTransform = ThisApplication->GetComponent< Transform >( GetObject() );
+	DrawCall ToSubmit;
+	ToSubmit.Mesh      = m_Mesh;
+	ToSubmit.Material  = m_Material;
+	ToSubmit.Transform = ThisTransform->GetTransformation();
+
+	Rendering::Submit( ToSubmit );
 }
