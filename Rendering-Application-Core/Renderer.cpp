@@ -22,7 +22,7 @@ void Renderer::Submit()
 	DrawCall ToSubmit;
 	ToSubmit.Mesh      = m_Mesh;
 	ToSubmit.Material  = m_Material;
-	ToSubmit.Transform = ThisTransform->GetTransformation();
+	ToSubmit.Transform = ThisTransform->GetGlobal();
 
 	Rendering::Submit( ToSubmit );
 }

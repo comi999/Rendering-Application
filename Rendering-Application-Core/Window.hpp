@@ -18,6 +18,9 @@ public:
 	bool ShouldClose() const;
 	static void SetActive( Window* a_Window );
 	static Window* GetActive();
+	static glm::vec2 GetMousePosition();
+	static bool GetMouseButton( int a_Button );
+	static bool GetKey( char a_Key );
 
 private:
 

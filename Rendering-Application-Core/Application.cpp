@@ -2,6 +2,8 @@
 #include "Rendering.hpp"
 #include "Renderer.hpp"
 #include "Transform.hpp"
+#include "Light.hpp"
+#include "Input.hpp"
 
 Application::Application( const char* a_Title, glm::uvec2 a_Size )
 	: m_Running( false )
@@ -25,6 +27,7 @@ void Application::Run()
 	// Initialize rendering pipeline.
 	Rendering::SetWindow( m_Window );
 	Rendering::Init();
+	Input::Init();
 
 	// Trigger the applications OnStart virtual function.
 	OnStart();
@@ -33,6 +36,8 @@ void Application::Run()
 	{
 		// Calculate delta time
 		float DeltaTime = 0.016f;
+
+		Input::Tick();
 		
 		// Call OnTick for all components.
 		UpdateAllComponents( DeltaTime );
@@ -49,11 +54,22 @@ void Application::Run()
 		// Set the main camera.
 		Rendering::SetMainCamera( GetComponent< Camera >( m_MainCamera ) );
 
+		// Setup rendering for frame.
+		Rendering::Begin();
+
+		PatchComponents< Transform >( []( Transform& a_Transform ) { a_Transform.Update(); } );
+
 		// Query all renderers to submit draw calls.
 		PatchComponents< Renderer >( []( Renderer& a_Renderer ) { a_Renderer.Submit(); } );
 
+		// Query all lights to submit.
+		PatchComponents< Light >( []( Light& a_Light ) { a_Light.BuildMatrix( Rendering::AddLight() ); } );
+
 		// Trigger Rendering pipeline to process DrawCalls.
 		Rendering::Draw();
+
+		// Flush Rendering
+		Rendering::End();
 	}
 
 	// Trigger the Applications OnStop virtual function.

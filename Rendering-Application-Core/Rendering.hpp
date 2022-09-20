@@ -1,5 +1,6 @@
 #pragma once
 #include <list>
+#include <vector>
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -23,7 +24,10 @@ public:
 	static bool Init();
 	static void Terminate();
 	static void Submit( const DrawCall& a_DrawCall );
+	static glm::mat4& AddLight();
+	static void Begin();
 	static void Draw();
+	static void End();
 	static void SetClearColour( glm::vec4 a_Colour );
 	static void SetWindow( Window* a_Window ) { s_Window = a_Window; }
 	static Window* GetWindow() { return s_Window; }
@@ -32,13 +36,14 @@ public:
 
 private:
 	
-	static Window*               s_Window;
-	static glm::vec4             s_ClearColour;
-	static std::list< DrawCall > s_DrawCalls;
-	static Camera*               s_MainCamera;
-	static const Mesh*           s_MainMesh;
-	static const Material*       s_MainMaterial;
-	static const Shader*         s_MainShader;
+	static Window*                  s_Window;
+	static glm::vec4                s_ClearColour;
+	static std::list< DrawCall >    s_DrawCalls;
+	static std::vector< glm::mat4 > s_Lights;
+	static Camera*                  s_MainCamera;
+	static const Mesh*              s_MainMesh;
+	static const Material*          s_MainMaterial;
+	static const Shader*            s_MainShader;
 
 	static GLuint s_ArrayHandle;
 	static GLuint s_BufferHandles[ 7 ];

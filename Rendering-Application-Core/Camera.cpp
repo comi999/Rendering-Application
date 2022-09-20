@@ -28,7 +28,12 @@ const glm::mat4& Camera::GetProjection() const
 glm::mat4 Camera::GetView() const
 {
 	Transform* CameraTransform = GetApplication()->GetComponent< Transform >( GetObject() );
-	return glm::lookAt( CameraTransform->GetPosition(), CameraTransform->GetPosition() + glm::vec3( 0, 0, 1 ), glm::vec3( 0, 1, 0 ) ); // glm::inverse( GetApplication()->GetComponent< Transform >( GetObject() )->GetTransformation() );
+
+	glm::quat CameraRotation = CameraTransform->GetRotation();
+	glm::vec4 Forward( 0.0f, 0.0f, 1.0f, 0.0f );
+	glm::mat4 Rotation = glm::mat4_cast( CameraRotation );
+	Forward = Rotation * Forward;
+	return glm::lookAt( CameraTransform->GetPosition(), CameraTransform->GetPosition() + glm::vec3( Forward ), glm::vec3( 0, 1, 0 ) );
 }
 
 glm::mat4 Camera::GetProjectionView() const

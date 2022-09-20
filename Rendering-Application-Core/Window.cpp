@@ -34,6 +34,23 @@ Window* Window::GetActive()
 	return s_ActiveWindow;
 }
 
+glm::vec2 Window::GetMousePosition()
+{
+	double x, y;
+	glfwGetCursorPos( *GetActive(), &x, &y );
+	return { x, y };
+}
+
+bool Window::GetMouseButton( int a_Button )
+{
+	return glfwGetMouseButton( *GetActive(), a_Button ) == GLFW_PRESS;
+}
+
+bool Window::GetKey( char a_Key )
+{
+	return glfwGetKey( *GetActive(), a_Key );
+}
+
 bool Window::ShouldClose() const
 {
 	return glfwWindowShouldClose( m_Window );

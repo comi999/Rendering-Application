@@ -24,6 +24,4 @@ private:
 	float     m_Aspect;
 	float     m_NearZ;
 	float     m_FarZ;
-
-	static Object s_MainCamera;
 };

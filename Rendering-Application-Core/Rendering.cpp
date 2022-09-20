@@ -7,15 +7,16 @@
 #include "Camera.hpp"
 #include "Material.hpp"
 
-Window*               Rendering::s_Window = nullptr;
-glm::vec4             Rendering::s_ClearColour;
-std::list< DrawCall > Rendering::s_DrawCalls;
-Camera*               Rendering::s_MainCamera = nullptr;
-const Mesh*           Rendering::s_MainMesh = nullptr;
-const Material*       Rendering::s_MainMaterial = nullptr;
-const Shader*         Rendering::s_MainShader = nullptr;
-GLuint                Rendering::s_ArrayHandle;
-GLuint                Rendering::s_BufferHandles[ 7 ];
+Window*                  Rendering::s_Window = nullptr;
+glm::vec4                Rendering::s_ClearColour;
+std::list< DrawCall >    Rendering::s_DrawCalls;
+std::vector< glm::mat4 > Rendering::s_Lights;
+Camera*                  Rendering::s_MainCamera = nullptr;
+const Mesh*              Rendering::s_MainMesh = nullptr;
+const Material*          Rendering::s_MainMaterial = nullptr;
+const Shader*            Rendering::s_MainShader = nullptr;
+GLuint                   Rendering::s_ArrayHandle;
+GLuint                   Rendering::s_BufferHandles[ 7 ];
 
 bool Rendering::Init()
 {
@@ -36,14 +37,23 @@ void Rendering::Submit( const DrawCall& a_DrawCall )
 	s_DrawCalls.push_back( a_DrawCall );
 }
 
+glm::mat4& Rendering::AddLight()
+{
+	s_Lights.emplace_back();
+	return s_Lights.back();
+}
+
+void Rendering::Begin()
+{
+	glEnable( GL_DEPTH_TEST );
+	glClearColor( s_ClearColour.r, s_ClearColour.g, s_ClearColour.b, s_ClearColour.a );
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+}
+
 void Rendering::Draw()
 {
 	if ( Window* ActiveWindow = Window::GetActive() )
 	{
-		glEnable( GL_DEPTH_TEST );
-		glClearColor( s_ClearColour.r, s_ClearColour.g, s_ClearColour.b, s_ClearColour.a );
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
 		if ( s_MainCamera )
 		{
 			// Get the PV matrix from the main camera.
@@ -51,10 +61,16 @@ void Rendering::Draw()
 
 			// Process drawing queue.
 			// Code...
-			s_DrawCalls.sort( []( const DrawCall& a_Left, const DrawCall& a_Right )
+			struct
 			{
-				return a_Left.Mesh <= a_Right.Mesh || a_Left.Material <= a_Right.Material;
-			} );
+				bool operator()( const DrawCall& a_Left, const DrawCall& a_Right )
+				{
+					//return a_Left.Mesh < a_Right.Mesh || a_Left.Material < a_Right.Material;
+
+					return true;
+				};
+			} Sorter;
+			//s_DrawCalls.sort( Sorter );
 
 			s_MainMesh = nullptr;
 			s_MainMaterial = nullptr;
@@ -139,31 +155,20 @@ void Rendering::Draw()
 				{
 					// Set up Material
 					s_MainMaterial = ThisCall.Material;
+					s_MainShader = s_MainMaterial->GetShader();
 
-					if ( s_MainMaterial )
-					{
-						s_MainShader = s_MainMaterial->GetShader();
-					}
-
-					if ( s_MainShader )
-					{
-						s_MainShader->Use();
-						// Apply properties...
-						
-						// Bind Diffuse
-						if ( Texture* Diffuse = s_MainMaterial->GetDiffuse() )
-						{
-							uint32_t SlotDiffuse = 0;
-							Diffuse->Bind( SlotDiffuse );
-							s_MainShader->SetUniformDiffuse( SlotDiffuse );
-						}
-					}
+					s_MainMaterial->Apply();
 				}
 
 				// Set up Transformation
 				if ( s_MainShader )
 				{
-					s_MainShader->SetUniformPVM( PV * ThisCall.Transform );
+					// Set world information.
+					s_MainShader->SetPVM( PV * ThisCall.Transform );
+					s_MainShader->SetM( ThisCall.Transform );
+
+					// Set light information.
+					s_MainShader->SetLights( s_Lights.data(), s_Lights.size() );
 				}
 
 				// glDrawElements
@@ -187,10 +192,14 @@ void Rendering::Draw()
 				}
 			}
 		}
-
-		glfwSwapBuffers( *Window::GetActive() );
-		glfwPollEvents();
 	}
+}
+
+void Rendering::End()
+{
+	s_Lights.clear();
+	glfwSwapBuffers( *Window::GetActive() );
+	glfwPollEvents();
 }
 
 void Rendering::SetClearColour( glm::vec4 a_Colour )

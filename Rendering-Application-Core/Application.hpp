@@ -7,8 +7,6 @@
 
 class Camera;
 
-
-
 class Application
 {
 private:
@@ -63,6 +61,8 @@ public:
 	void Run();
 	void Quit();
 	const Window* GetWindow() const { return m_Window; }
+	entt::registry& GetRegistry() { return m_Registry; }
+	const entt::registry& GetRegistry() const { return m_Registry; }
 	Object Create();
 	void Destroy( Object a_Object );
 	Camera* GetMainCamera();
@@ -124,11 +124,9 @@ T* Application::GetComponent( Object a_Object )
 template < typename T >
 void Application::DestroyComponent( Object a_Object )
 {
-	T* Old = m_Registry.try_get< T >( a_Object );
-
 	if constexpr ( HasOnDestroy< T >::Value )
 	{
-		Old->OnDestroy();
+		if ( T* Old = m_Registry.try_get< T >( a_Object ) ) Old->OnDestroy();
 	}
 
 	m_Registry.destroy( a_Object );
