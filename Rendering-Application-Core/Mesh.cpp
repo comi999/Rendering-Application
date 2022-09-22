@@ -1,22 +1,26 @@
 #include "Mesh.hpp"
 
+#define AI_MAX_BONE_WEIGHTS   4
+#include <assimp/config.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
-#include <assimp/config.h>
 #include <assimp/scene.h>
+
+#include <iostream>
 
 Mesh::Mesh( const std::string& a_Path )
 {
 	Assimp::Importer Importer;
 	const aiScene* ThisScene = Importer.ReadFile( a_Path, 
-					   aiPostProcessSteps::aiProcess_GenNormals |
-					   aiPostProcessSteps::aiProcess_CalcTangentSpace |
-					   aiPostProcessSteps::aiProcess_Triangulate |
-					   aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
-					   aiPostProcessSteps::aiProcess_EmbedTextures |
-					   aiPostProcessSteps::aiProcess_RemoveRedundantMaterials |
-					   aiPostProcessSteps::aiProcess_FindInvalidData |
-					   aiPostProcessSteps::aiProcess_FixInfacingNormals );
+		aiPostProcessSteps::aiProcess_GenNormals |
+		aiPostProcessSteps::aiProcess_CalcTangentSpace |
+		aiPostProcessSteps::aiProcess_Triangulate |
+		aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
+		aiPostProcessSteps::aiProcess_EmbedTextures |
+		aiPostProcessSteps::aiProcess_RemoveRedundantMaterials |
+		aiPostProcessSteps::aiProcess_FindInvalidData |
+		aiPostProcessSteps::aiProcess_FixInfacingNormals |
+		aiPostProcessSteps::aiProcess_LimitBoneWeights );
 
 	if ( !ThisScene || !ThisScene->mNumMeshes )
 	{
@@ -27,7 +31,7 @@ Mesh::Mesh( const std::string& a_Path )
 	
 	if ( ThisMesh->HasFaces() )
 	{
-		m_Indices.reserve( ThisMesh->mNumFaces * 3 );
+		m_Indices.reserve( static_cast< size_t >( ThisMesh->mNumFaces ) * 3 );
 
 		for ( uint32_t i = 0; i < ThisMesh->mNumFaces; ++i )
 		{
@@ -95,5 +99,29 @@ Mesh::Mesh( const std::string& a_Path )
 			aiColor4D Colour = ThisMesh->mColors[ 0 ][ i ];
 			m_Colours.emplace_back( Colour.r, Colour.g, Colour.b, Colour.a );
 		}
+	}
+
+	//if ( ThisMesh->HasBones() )
+	{
+		//m_BoneIndices.reserve( ThisMesh->mNumBones );
+		//m_BoneWeights.reserve( ThisMesh->mNumBones );
+
+		//for ( uint32_t i = 0; i < ThisMesh->mNumBones; ++i )
+		//{
+		//	m_BoneIndices.emplace_back();
+		//	m_BoneWeights.emplace_back();
+		//	auto& BoneIndices = m_BoneIndices.back();
+		//	auto& BoneWeights = m_BoneWeights.back();
+		//	auto* Bone = ThisMesh->mBones[ i ];
+		//	auto BoneName = Bone->mName;
+		//	//ThisScene->mSkeletons[0]->mBones[0]->
+
+		//	//for ( uint32_t j = 0; j < ->mNumWeights; ++j )
+		//	{
+		//		//std::cout << ThisMesh->mBones[ i ]->mWeights[ j ].mWeight << "   :   " << ThisMesh->mBones[ i ]->mWeights[ j ].mVertexId << std::endl;
+		//		//BoneIndices[ j ] = ThisMesh->mBones[ i ]->mWeights[ j ].mVertexId;
+		//		//BoneWeights[ j ] = ThisMesh->mBones[ i ]->mWeights[ j ].mWeight;
+		//	}
+		//}
 	}
 }

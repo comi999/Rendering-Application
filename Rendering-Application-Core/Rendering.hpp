@@ -46,5 +46,5 @@ private:
 	static const Shader*            s_MainShader;
 
 	static GLuint s_ArrayHandle;
-	static GLuint s_BufferHandles[ 7 ];
+	static GLuint s_BufferHandles[ 9 ];
 };

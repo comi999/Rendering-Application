@@ -1,8 +1,9 @@
 #pragma once
 #include "Shader.hpp"
 #include "Texture.hpp"
+#include "Resource.hpp"
 
-class Material
+class Material : public Resource
 {
 public:
 

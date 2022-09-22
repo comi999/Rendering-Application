@@ -5,6 +5,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "Resource.hpp"
+
 enum TextureType : uint32_t
 {
 	TextureType_Diffuse,
@@ -13,7 +15,7 @@ enum TextureType : uint32_t
 	TextureType_None
 };
 
-class Texture
+class Texture : public Resource
 {
 public:
 

@@ -7,6 +7,8 @@
 #include "Camera.hpp"
 #include "Material.hpp"
 
+#define BUFFER_HANDLE_COUNT 9
+
 Window*                  Rendering::s_Window = nullptr;
 glm::vec4                Rendering::s_ClearColour;
 std::list< DrawCall >    Rendering::s_DrawCalls;
@@ -16,7 +18,7 @@ const Mesh*              Rendering::s_MainMesh = nullptr;
 const Material*          Rendering::s_MainMaterial = nullptr;
 const Shader*            Rendering::s_MainShader = nullptr;
 GLuint                   Rendering::s_ArrayHandle;
-GLuint                   Rendering::s_BufferHandles[ 7 ];
+GLuint                   Rendering::s_BufferHandles[ BUFFER_HANDLE_COUNT ];
 
 bool Rendering::Init()
 {
@@ -24,11 +26,13 @@ bool Rendering::Init()
 	if ( glewInit() != GLEW_OK ) return false;
 
 	glGenVertexArrays( 1, &s_ArrayHandle );
-	glGenBuffers( 7, s_BufferHandles );
+	glGenBuffers( BUFFER_HANDLE_COUNT, s_BufferHandles );
 }
 
 void Rendering::Terminate()
 {
+	glDeleteVertexArrays( 1, &s_ArrayHandle );
+	glDeleteBuffers( BUFFER_HANDLE_COUNT, s_BufferHandles );
 	glfwTerminate();
 }
 
@@ -65,12 +69,12 @@ void Rendering::Draw()
 			{
 				bool operator()( const DrawCall& a_Left, const DrawCall& a_Right )
 				{
-					//return a_Left.Mesh < a_Right.Mesh || a_Left.Material < a_Right.Material;
+					return a_Left.Mesh < a_Right.Mesh || a_Left.Material < a_Right.Material;
 
-					return true;
+					//return true;
 				};
 			} Sorter;
-			//s_DrawCalls.sort( Sorter );
+			//s_DrawCalls.sort( Sorter ); // THIS IS BREAKING, FIX THE SORTING.
 
 			s_MainMesh = nullptr;
 			s_MainMaterial = nullptr;
@@ -140,9 +144,25 @@ void Rendering::Draw()
 						glEnableVertexAttribArray( 5 );
 					} else glDisableVertexAttribArray( 5 );
 
+					if ( s_MainMesh->GetBoneIndices() )
+					{
+						glBindBuffer( GL_ARRAY_BUFFER, s_BufferHandles[ 6 ] );
+						glBufferData( GL_ARRAY_BUFFER, s_MainMesh->GetVertexCount() * sizeof( Mesh::BoneIndex ), s_MainMesh->GetBoneIndices(), GL_STATIC_DRAW );
+						glVertexAttribPointer( 6, AI_LMW_MAX_WEIGHTS, GL_UNSIGNED_INT, false, sizeof( Mesh::BoneIndex ), ( void* )0 );
+						glEnableVertexAttribArray( 6 );
+					} else glDisableVertexAttribArray( 6 );
+
+					if ( s_MainMesh->GetBoneWeights() )
+					{
+						glBindBuffer( GL_ARRAY_BUFFER, s_BufferHandles[ 7 ] );
+						glBufferData( GL_ARRAY_BUFFER, s_MainMesh->GetVertexCount() * sizeof( Mesh::BoneWeight ), s_MainMesh->GetBoneWeights(), GL_STATIC_DRAW );
+						glVertexAttribPointer( 7, AI_LMW_MAX_WEIGHTS, GL_FLOAT, false, sizeof( Mesh::BoneWeight ), ( void* )0 );
+						glEnableVertexAttribArray( 7 );
+					} else glDisableVertexAttribArray( 7 );
+
 					if ( s_MainMesh->GetIndices() )
 					{
-						glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, s_BufferHandles[ 6 ] );
+						glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, s_BufferHandles[ 8 ] );
 						glBufferData( GL_ELEMENT_ARRAY_BUFFER, s_MainMesh->GetIndexCount() * sizeof( uint32_t ), s_MainMesh->GetIndices(), GL_STATIC_DRAW );
 					}
 
@@ -175,7 +195,7 @@ void Rendering::Draw()
 				if ( s_MainMesh && s_MainMesh->GetIndices() )
 				{
 					glBindVertexArray( s_ArrayHandle );
-					glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, s_BufferHandles[ 6 ] );
+					glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, s_BufferHandles[ 8 ] );
 					glDrawElements( GL_TRIANGLES, s_MainMesh->GetIndexCount(), GL_UNSIGNED_INT, ( void* )0 );
 					glBindVertexArray( 0 );
 					glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );

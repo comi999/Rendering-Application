@@ -11,8 +11,6 @@ class DemoController : public Component
 {
 public:
 
-	bool Rotate = false;
-
 	void OnCreate()
 	{
 		m_Model0 = GetApplication()->Create();
