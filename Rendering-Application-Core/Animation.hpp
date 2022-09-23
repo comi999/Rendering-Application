@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
@@ -22,6 +24,14 @@ struct KeyScale
 	float     Time;
 };
 
+struct AnimationChannel
+{
+	std::string                Name;
+	std::vector< KeyPosition > KeyPositions;
+	std::vector< KeyRotation > KeyRotations;
+	std::vector< KeyScale >    KeyScales;
+};
+
 class Animation : public Resource
 {
 public:
@@ -31,6 +41,7 @@ public:
 
 private:
 
-	float m_TicksPerSecond;
-	float m_Duration;
+	float                           m_TicksPerSecond;
+	float                           m_Duration;
+	std::vector< AnimationChannel > m_Channels;
 };

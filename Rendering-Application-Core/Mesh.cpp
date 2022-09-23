@@ -5,30 +5,6 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
-// Delete me
-#include <iostream>
-static void Print( aiNode* node, int indent )
-{
-	if ( !node ) return;
-
-	std::cout << node->mName.C_Str() << std::endl;
-
-	for ( uint32_t i = 0; i < node->mNumChildren; ++i )
-	{
-		for ( uint32_t j = 0; j < 1 && j < indent; ++j )
-		{
-			std::cout << "|";
-		}
-
-		for ( uint32_t j = 1; j < indent; ++j )
-		{
-			std::cout << "-";
-		}
-		
-		Print( node->mChildren[ i ], indent + 1 );
-	}
-} // End Delete me
-
 Mesh::Mesh( const std::string& a_Path )
 {
 	Assimp::Importer Importer;
@@ -42,7 +18,7 @@ Mesh::Mesh( const std::string& a_Path )
 		aiPostProcessSteps::aiProcess_FindInvalidData |
 		aiPostProcessSteps::aiProcess_FixInfacingNormals |
 		aiPostProcessSteps::aiProcess_LimitBoneWeights |
-	aiPostProcessSteps::aiProcess_PopulateArmatureData );
+		aiPostProcessSteps::aiProcess_PopulateArmatureData );
 
 	if ( !ThisScene || !ThisScene->mNumMeshes )
 	{
@@ -150,7 +126,4 @@ Mesh::Mesh( const std::string& a_Path )
 			}
 		}
 	}
-
-	// Delete me
-	Print( ThisMesh->mBones[ 0 ]->mNode, 0 );
 }

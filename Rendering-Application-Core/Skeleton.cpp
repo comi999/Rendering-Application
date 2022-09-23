@@ -17,6 +17,7 @@ Skeleton::Skeleton( const std::string& a_Path )
 	{
 		Bone& NewBone = m_Bones.emplace_back();
 		aiBone* ThisBone = ThisMesh->mBones[ i ];
+		m_Names[ ThisBone->mName.C_Str() ] = i;
 
 		for ( uint32_t x = 0; x < 4; ++x )
 		for ( uint32_t y = 0; y < 4; ++y )

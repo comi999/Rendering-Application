@@ -11,6 +11,7 @@
 #include "Transform.hpp"
 #include "Object.hpp"
 #include "Skeleton.hpp"
+#include "Animation.hpp"
 
 class ObjectRotator : public Component
 {
@@ -32,6 +33,8 @@ public:
 		//SomeMesh = new Mesh( "Resources/SoulSpear/soulspear.obj" );
 		SomeMesh = new Mesh( "Resources/Animation_Test.fbx" );
 		SomeSkeleton = new Skeleton( "Resources/Animation_Test.fbx" );
+
+		SomeAnimation = new Animation( "Resources/Animation_Test.fbx" );
 
 		SomeMaterial = new Material();
 		SomeMaterial->SetShader( SomeShader );
@@ -59,6 +62,7 @@ public:
 	{
 		delete SomeMesh;
 		delete SomeSkeleton;
+		delete SomeAnimation;
 		delete SomeShader;
 		delete SomeMaterial;
 		delete SomeTextureDiffuse;
@@ -68,11 +72,12 @@ public:
 
 private:
 
-	Mesh*     SomeMesh;
-	Skeleton* SomeSkeleton;
-	Shader*   SomeShader;
-	Material* SomeMaterial;
-	Texture*  SomeTextureDiffuse;
-	Texture*  SomeTextureNormal;
-	Texture*  SomeTextureSpecular;
+	Mesh*      SomeMesh;
+	Skeleton*  SomeSkeleton;
+	Animation* SomeAnimation;
+	Shader*    SomeShader;
+	Material*  SomeMaterial;
+	Texture*   SomeTextureDiffuse;
+	Texture*   SomeTextureNormal;
+	Texture*   SomeTextureSpecular;
 };
