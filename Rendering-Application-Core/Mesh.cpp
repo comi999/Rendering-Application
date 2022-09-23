@@ -1,6 +1,5 @@
 #include "Mesh.hpp"
 
-#define AI_MAX_BONE_WEIGHTS   4
 #include <assimp/config.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -101,27 +100,30 @@ Mesh::Mesh( const std::string& a_Path )
 		}
 	}
 
-	//if ( ThisMesh->HasBones() )
+	if ( ThisMesh->HasBones() )
 	{
-		//m_BoneIndices.reserve( ThisMesh->mNumBones );
-		//m_BoneWeights.reserve( ThisMesh->mNumBones );
+		m_BoneInfluences.resize( ThisMesh->mNumVertices, 0 );
+		m_BoneIndices.resize( ThisMesh->mNumVertices );
+		m_BoneWeights.resize( ThisMesh->mNumVertices );
 
-		//for ( uint32_t i = 0; i < ThisMesh->mNumBones; ++i )
-		//{
-		//	m_BoneIndices.emplace_back();
-		//	m_BoneWeights.emplace_back();
-		//	auto& BoneIndices = m_BoneIndices.back();
-		//	auto& BoneWeights = m_BoneWeights.back();
-		//	auto* Bone = ThisMesh->mBones[ i ];
-		//	auto BoneName = Bone->mName;
-		//	//ThisScene->mSkeletons[0]->mBones[0]->
+		for ( uint32_t i = 0; i < ThisMesh->mNumBones; ++i )
+		{
+			auto* Bone = ThisMesh->mBones[ i ];
+			
+			for ( uint32_t j = 0; j < Bone->mNumWeights; ++j )
+			{
+				uint32_t VertexIndex = Bone->mWeights[ j ].mVertexId;
+				auto& BoneInfluences = m_BoneInfluences[ VertexIndex ];
+				auto& BoneIndices = m_BoneIndices[ VertexIndex ];
+				auto& BoneWeights = m_BoneWeights[ VertexIndex ];
 
-		//	//for ( uint32_t j = 0; j < ->mNumWeights; ++j )
-		//	{
-		//		//std::cout << ThisMesh->mBones[ i ]->mWeights[ j ].mWeight << "   :   " << ThisMesh->mBones[ i ]->mWeights[ j ].mVertexId << std::endl;
-		//		//BoneIndices[ j ] = ThisMesh->mBones[ i ]->mWeights[ j ].mVertexId;
-		//		//BoneWeights[ j ] = ThisMesh->mBones[ i ]->mWeights[ j ].mWeight;
-		//	}
-		//}
+				if ( BoneInfluences < AI_MAX_BONE_WEIGHTS )
+				{
+					BoneIndices[ BoneInfluences ] = i;
+					BoneWeights[ BoneInfluences ] = Bone->mWeights[ j ].mWeight;
+					++BoneInfluences;
+				}
+			}
+		}
 	}
 }

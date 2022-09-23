@@ -28,8 +28,8 @@ public:
 		SomeShader = new Shader( "Resources/Simple.shader" );
 		SomeShader->Compile();
 
-		SomeMesh = new Mesh( "Resources/SoulSpear/soulspear.obj" );
-		//SomeMesh = new Mesh( "Resources/Animation_Test.fbx" );
+		//SomeMesh = new Mesh( "Resources/SoulSpear/soulspear.obj" );
+		SomeMesh = new Mesh( "Resources/Animation_Test.fbx" );
 
 		SomeMaterial = new Material();
 		SomeMaterial->SetShader( SomeShader );

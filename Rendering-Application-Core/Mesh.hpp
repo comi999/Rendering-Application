@@ -5,14 +5,14 @@
 
 #include "Resource.hpp"
 
-#define AI_LMW_MAX_WEIGHTS 4
+#define AI_MAX_BONE_WEIGHTS 4
 
 class Mesh : public Resource
 {
 public:
 
-	typedef glm::vec< AI_LMW_MAX_WEIGHTS, uint32_t > BoneIndex;
-	typedef glm::vec< AI_LMW_MAX_WEIGHTS, float > BoneWeight;
+	typedef glm::vec< AI_MAX_BONE_WEIGHTS, uint32_t > BoneIndex;
+	typedef glm::vec< AI_MAX_BONE_WEIGHTS, float   > BoneWeight;
 
 	Mesh() = default;
 	Mesh( const std::string& a_Path );
@@ -37,6 +37,7 @@ private:
 	std::vector< glm::vec4 >  m_Bitangents;
 	std::vector< glm::vec2 >  m_Texels;
 	std::vector< glm::vec4 >  m_Colours;
+	std::vector< uint32_t >   m_BoneInfluences;
 	std::vector< BoneIndex >  m_BoneIndices;
 	std::vector< BoneWeight > m_BoneWeights;
 };
