@@ -147,16 +147,16 @@ void Rendering::Draw()
 					if ( s_MainMesh->GetBoneIndices() )
 					{
 						glBindBuffer( GL_ARRAY_BUFFER, s_BufferHandles[ 6 ] );
-						glBufferData( GL_ARRAY_BUFFER, s_MainMesh->GetVertexCount() * sizeof( Mesh::BoneIndex ), s_MainMesh->GetBoneIndices(), GL_STATIC_DRAW );
-						glVertexAttribPointer( 6, AI_MAX_BONE_WEIGHTS, GL_UNSIGNED_INT, false, sizeof( Mesh::BoneIndex ), ( void* )0 );
+						glBufferData( GL_ARRAY_BUFFER, s_MainMesh->GetVertexCount() * sizeof( Mesh::BoneIndices ), s_MainMesh->GetBoneIndices(), GL_STATIC_DRAW );
+						glVertexAttribPointer( 6, AI_MAX_BONE_WEIGHTS, GL_UNSIGNED_INT, false, sizeof( Mesh::BoneIndices ), ( void* )0 );
 						glEnableVertexAttribArray( 6 );
 					} else glDisableVertexAttribArray( 6 );
 
 					if ( s_MainMesh->GetBoneWeights() )
 					{
 						glBindBuffer( GL_ARRAY_BUFFER, s_BufferHandles[ 7 ] );
-						glBufferData( GL_ARRAY_BUFFER, s_MainMesh->GetVertexCount() * sizeof( Mesh::BoneWeight ), s_MainMesh->GetBoneWeights(), GL_STATIC_DRAW );
-						glVertexAttribPointer( 7, AI_MAX_BONE_WEIGHTS, GL_FLOAT, false, sizeof( Mesh::BoneWeight ), ( void* )0 );
+						glBufferData( GL_ARRAY_BUFFER, s_MainMesh->GetVertexCount() * sizeof( Mesh::BoneWeights ), s_MainMesh->GetBoneWeights(), GL_STATIC_DRAW );
+						glVertexAttribPointer( 7, AI_MAX_BONE_WEIGHTS, GL_FLOAT, false, sizeof( Mesh::BoneWeights ), ( void* )0 );
 						glEnableVertexAttribArray( 7 );
 					} else glDisableVertexAttribArray( 7 );
 

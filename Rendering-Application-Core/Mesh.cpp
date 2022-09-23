@@ -5,7 +5,29 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
+// Delete me
 #include <iostream>
+static void Print( aiNode* node, int indent )
+{
+	if ( !node ) return;
+
+	std::cout << node->mName.C_Str() << std::endl;
+
+	for ( uint32_t i = 0; i < node->mNumChildren; ++i )
+	{
+		for ( uint32_t j = 0; j < 1 && j < indent; ++j )
+		{
+			std::cout << "|";
+		}
+
+		for ( uint32_t j = 1; j < indent; ++j )
+		{
+			std::cout << "-";
+		}
+		
+		Print( node->mChildren[ i ], indent + 1 );
+	}
+} // End Delete me
 
 Mesh::Mesh( const std::string& a_Path )
 {
@@ -19,7 +41,8 @@ Mesh::Mesh( const std::string& a_Path )
 		aiPostProcessSteps::aiProcess_RemoveRedundantMaterials |
 		aiPostProcessSteps::aiProcess_FindInvalidData |
 		aiPostProcessSteps::aiProcess_FixInfacingNormals |
-		aiPostProcessSteps::aiProcess_LimitBoneWeights );
+		aiPostProcessSteps::aiProcess_LimitBoneWeights |
+	aiPostProcessSteps::aiProcess_PopulateArmatureData );
 
 	if ( !ThisScene || !ThisScene->mNumMeshes )
 	{
@@ -102,7 +125,8 @@ Mesh::Mesh( const std::string& a_Path )
 
 	if ( ThisMesh->HasBones() )
 	{
-		m_BoneInfluences.resize( ThisMesh->mNumVertices, 0 );
+		std::vector< uint32_t > BoneInfluenceCounts;
+		BoneInfluenceCounts.resize( ThisMesh->mNumVertices );
 		m_BoneIndices.resize( ThisMesh->mNumVertices );
 		m_BoneWeights.resize( ThisMesh->mNumVertices );
 
@@ -113,7 +137,7 @@ Mesh::Mesh( const std::string& a_Path )
 			for ( uint32_t j = 0; j < Bone->mNumWeights; ++j )
 			{
 				uint32_t VertexIndex = Bone->mWeights[ j ].mVertexId;
-				auto& BoneInfluences = m_BoneInfluences[ VertexIndex ];
+				auto& BoneInfluences = BoneInfluenceCounts[ VertexIndex ];
 				auto& BoneIndices = m_BoneIndices[ VertexIndex ];
 				auto& BoneWeights = m_BoneWeights[ VertexIndex ];
 
@@ -126,4 +150,7 @@ Mesh::Mesh( const std::string& a_Path )
 			}
 		}
 	}
+
+	// Delete me
+	Print( ThisMesh->mBones[ 0 ]->mNode, 0 );
 }
