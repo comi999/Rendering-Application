@@ -1,6 +1,7 @@
 #include "Application.hpp"
 #include "Rendering.hpp"
 #include "Renderer.hpp"
+#include "LineRenderer.hpp"
 #include "Transform.hpp"
 #include "Light.hpp"
 #include "Animator.hpp"
@@ -62,6 +63,9 @@ void Application::Run()
 
 		// Query all renderers to submit draw calls.
 		PatchComponents< Renderer >( []( Renderer& a_Renderer ) { a_Renderer.Submit(); } );
+
+		// Query all line renderers to submit draw calls.
+		PatchComponents< LineRenderer >( []( LineRenderer& a_LineRenderer ) { a_LineRenderer.Submit(); } );
 
 		// Query all lights to submit.
 		PatchComponents< Light >( []( Light& a_Light ) { a_Light.BuildMatrix( Rendering::AddLight() ); } );

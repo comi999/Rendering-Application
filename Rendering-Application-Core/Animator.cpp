@@ -1,6 +1,7 @@
 #include <glm/gtx/matrix_decompose.hpp>
 
 #include "Animator.hpp"
+#include "LineRenderer.hpp"
 
 Animator::Animator()
 	: m_IsPlaying( false )
@@ -57,6 +58,7 @@ void Animator::SetSkeleton( const Skeleton* a_Skeleton )
 			const Bone* ThisBone = ( *m_Skeleton )[ i ];
 			Object NewObject = GetApplication()->Create();
 			Transform* NewTransform = GetApplication()->GetComponent< Transform >( NewObject );
+			//LineRenderer* NewLineRenderer = GetApplication()->AddComponent< LineRenderer >( NewObject );
 
 			glm::vec3 Scale;
 			glm::quat Rotation;
@@ -77,7 +79,7 @@ void Animator::SetSkeleton( const Skeleton* a_Skeleton )
 
 			if ( ThisBone->Parent < 0 )
 			{
-				//ThisTransform->AttachChild( NewTransform, false );
+				ThisTransform->AttachChild( NewTransform, false );
 				continue;
 			}
 

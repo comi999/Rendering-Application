@@ -28,6 +28,10 @@ public:
 	const BoneIndices*  GetBoneIndices() const { return m_BoneIndices.data(); }
 	const BoneWeights* GetBoneWeights() const { return m_BoneWeights.data(); }
 
+	void AddIndex( uint32_t a_Index ) { m_Indices.push_back( a_Index ); }
+	void AddPosition( const glm::vec4& a_Position ) { m_Positions.push_back( a_Position ); }
+	void AddColour( const glm::vec4& a_Colour ) { m_Colours.push_back( a_Colour ); }
+
 private:
 
 	std::vector< uint32_t >    m_Indices;

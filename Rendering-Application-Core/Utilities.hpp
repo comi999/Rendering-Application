@@ -12,4 +12,11 @@ namespace Utility
 			a_To[ x ][ y ] = a_From[ y ][ x ];
 		}
 	}
+
+	class OnStart
+	{
+	public:
+
+		OnStart( void(*a_OnStart )() ) { a_OnStart(); }
+	};
 }
