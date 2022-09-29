@@ -1,10 +1,13 @@
-#include "Animation.hpp"
-
 #include <assimp/config.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+
+#include "Animation.hpp"
+#include "Skeleton.hpp"
+
 #include <iostream> // Delete me
+
 Animation::Animation( const std::string& a_Path )
 	: Resource( a_Path )
 	, m_Duration( 0.0f )
@@ -13,6 +16,7 @@ Animation::Animation( const std::string& a_Path )
 	Assimp::Importer Importer;
 	const aiScene* ThisScene = Importer.ReadFile( a_Path, 0 );
 	aiAnimation* ThisAnimation = ThisScene->mAnimations[ 0 ];
+	Skeleton AnimationSkeleton( a_Path );
 	m_TicksPerSecond = ThisAnimation->mTicksPerSecond;
 	m_Duration = ThisAnimation->mDuration;
 	m_Channels.resize( ThisAnimation->mNumChannels );
@@ -22,10 +26,11 @@ Animation::Animation( const std::string& a_Path )
 		auto& NewChannel = m_Channels[ i ];
 		auto* ThisChannel = ThisAnimation->mChannels[ i ];
 		NewChannel.Name = ThisAnimation->mChannels[ i ]->mNodeName.C_Str();
+		NewChannel.BoneIndex = AnimationSkeleton[ NewChannel.Name ]->Index;
 		NewChannel.KeyPositions.resize( ThisChannel->mNumPositionKeys );
 		NewChannel.KeyRotations.resize( ThisChannel->mNumRotationKeys );
 		NewChannel.KeyScales.resize( ThisChannel->mNumScalingKeys );
-		std::cout << NewChannel.Name << std::endl;
+
 		for ( uint32_t j = 0; j < ThisChannel->mNumPositionKeys; ++j )
 		{
 			auto& ThisPositionKey = ThisChannel->mPositionKeys[ j ];

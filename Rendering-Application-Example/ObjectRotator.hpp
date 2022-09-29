@@ -12,39 +12,13 @@
 #include "Object.hpp"
 #include "Skeleton.hpp"
 #include "Animation.hpp"
+#include "Animator.hpp"
 
 class ObjectRotator : public Component
 {
 public:
 
 	bool Rotate = false;
-
-	void OnCreate()
-	{
-		Renderer* SomeRenderer = GetApplication()->AddComponent< Renderer >( GetObject() );
-
-		SomeTextureDiffuse = new Texture( "Resources/SoulSpear/soulspear_diffuse.tga", TextureType_Diffuse );
-		SomeTextureNormal = new Texture( "Resources/SoulSpear/soulspear_normal.tga", TextureType_Normal );
-		SomeTextureSpecular = new Texture( "Resources/SoulSpear/soulspear_specular.tga", TextureType_Specular );
-		
-		SomeShader = new Shader( "Resources/Simple.shader" );
-		SomeShader->Compile();
-
-		//SomeMesh = new Mesh( "Resources/SoulSpear/soulspear.obj" );
-		SomeMesh = new Mesh( "Resources/Animation_Test.fbx" );
-		SomeSkeleton = new Skeleton( "Resources/Animation_Test.fbx" );
-
-		SomeAnimation = new Animation( "Resources/Animation_Test.fbx" );
-
-		SomeMaterial = new Material();
-		SomeMaterial->SetShader( SomeShader );
-		SomeMaterial->SetTexture( SomeTextureDiffuse );
-		SomeMaterial->SetTexture( SomeTextureNormal );
-		SomeMaterial->SetTexture( SomeTextureSpecular );
-
-		SomeRenderer->SetMaterial( SomeMaterial );
-		SomeRenderer->SetMesh( SomeMesh );
-	}
 
 	void OnTick( float a_DeltaTime )
 	{
@@ -57,27 +31,4 @@ public:
 			ThisTransform->SetRotation( Rotation );
 		}
 	}
-
-	void OnDestroy()
-	{
-		delete SomeMesh;
-		delete SomeSkeleton;
-		delete SomeAnimation;
-		delete SomeShader;
-		delete SomeMaterial;
-		delete SomeTextureDiffuse;
-		delete SomeTextureNormal;
-		delete SomeTextureSpecular;
-	}
-
-private:
-
-	Mesh*      SomeMesh;
-	Skeleton*  SomeSkeleton;
-	Animation* SomeAnimation;
-	Shader*    SomeShader;
-	Material*  SomeMaterial;
-	Texture*   SomeTextureDiffuse;
-	Texture*   SomeTextureNormal;
-	Texture*   SomeTextureSpecular;
 };

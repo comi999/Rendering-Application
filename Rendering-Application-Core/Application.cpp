@@ -3,6 +3,7 @@
 #include "Renderer.hpp"
 #include "Transform.hpp"
 #include "Light.hpp"
+#include "Animator.hpp"
 #include "Input.hpp"
 
 Application::Application( const char* a_Title, glm::uvec2 a_Size )
@@ -64,6 +65,15 @@ void Application::Run()
 
 		// Query all lights to submit.
 		PatchComponents< Light >( []( Light& a_Light ) { a_Light.BuildMatrix( Rendering::AddLight() ); } );
+
+		// Query all Animator's to submit bones.
+		PatchComponents< Animator >( []( Animator& a_Animator ) 
+		{
+			for ( uint32_t i = 0; i < a_Animator.GetSkeleton()->GetBoneCount(); ++i )
+			{
+				a_Animator.BuildMatrix( Rendering::AddBone(), i );
+			}
+		} );
 
 		// Trigger Rendering pipeline to process DrawCalls.
 		Rendering::Draw();

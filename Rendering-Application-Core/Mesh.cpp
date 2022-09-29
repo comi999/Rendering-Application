@@ -1,9 +1,12 @@
 #include "Mesh.hpp"
+#include "Skeleton.hpp"
 
 #include <assimp/config.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+
+#include <iostream>
 
 Mesh::Mesh( const std::string& a_Path )
 {
@@ -101,11 +104,12 @@ Mesh::Mesh( const std::string& a_Path )
 
 	if ( ThisMesh->HasBones() )
 	{
+		Skeleton MeshSkeleton( a_Path );
 		std::vector< uint32_t > BoneInfluenceCounts;
 		BoneInfluenceCounts.resize( ThisMesh->mNumVertices );
 		m_BoneIndices.resize( ThisMesh->mNumVertices );
 		m_BoneWeights.resize( ThisMesh->mNumVertices );
-
+		
 		for ( uint32_t i = 0; i < ThisMesh->mNumBones; ++i )
 		{
 			auto* Bone = ThisMesh->mBones[ i ];
@@ -119,7 +123,7 @@ Mesh::Mesh( const std::string& a_Path )
 
 				if ( BoneInfluences < AI_MAX_BONE_WEIGHTS )
 				{
-					BoneIndices[ BoneInfluences ] = i;
+					BoneIndices[ BoneInfluences ] = MeshSkeleton[ Bone->mName.C_Str() ]->Index;
 					BoneWeights[ BoneInfluences ] = Bone->mWeights[ j ].mWeight;
 					++BoneInfluences;
 				}

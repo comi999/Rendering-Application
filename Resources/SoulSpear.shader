@@ -4,12 +4,14 @@ VERTEX_BEGIN
 uniform mat4 u_PVM;
 uniform mat4 u_M;
 
-layout (location = 0) in vec4 i_Position;
-layout (location = 1) in vec4 i_Normal;
-layout (location = 2) in vec4 i_Tangent;
-layout (location = 3) in vec4 i_Bitangent;
-layout (location = 4) in vec2 i_Texel;
-//layout (location = 5) in vec4 i_Colour;
+layout( location = 0 ) in vec4 i_Position;
+layout( location = 1 ) in vec4 i_Normal;
+layout( location = 2 ) in vec4 i_Tangent;
+layout( location = 3 ) in vec4 i_Bitangent;
+layout( location = 4 ) in vec2 i_Texel;
+//layout ( location = 5 ) in vec4 i_Colour;
+layout( location = 7 ) in uvec4 i_BoneIndices;
+layout( location = 8 ) in vec4 i_BoneWeights;
 
 out vec4 o_Position;
 out vec2 o_Texel;

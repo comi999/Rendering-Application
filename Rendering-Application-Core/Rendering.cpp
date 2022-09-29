@@ -7,12 +7,12 @@
 #include "Camera.hpp"
 #include "Material.hpp"
 
-#define BUFFER_HANDLE_COUNT 9
 
 Window*                  Rendering::s_Window = nullptr;
 glm::vec4                Rendering::s_ClearColour;
 std::list< DrawCall >    Rendering::s_DrawCalls;
 std::vector< glm::mat4 > Rendering::s_Lights;
+std::vector< glm::mat4 > Rendering::s_Bones;
 Camera*                  Rendering::s_MainCamera = nullptr;
 const Mesh*              Rendering::s_MainMesh = nullptr;
 const Material*          Rendering::s_MainMaterial = nullptr;
@@ -43,8 +43,12 @@ void Rendering::Submit( const DrawCall& a_DrawCall )
 
 glm::mat4& Rendering::AddLight()
 {
-	s_Lights.emplace_back();
-	return s_Lights.back();
+	return s_Lights.emplace_back();
+}
+
+glm::mat4& Rendering::AddBone()
+{
+	return s_Bones.emplace_back();
 }
 
 void Rendering::Begin()
@@ -148,7 +152,7 @@ void Rendering::Draw()
 					{
 						glBindBuffer( GL_ARRAY_BUFFER, s_BufferHandles[ 6 ] );
 						glBufferData( GL_ARRAY_BUFFER, s_MainMesh->GetVertexCount() * sizeof( Mesh::BoneIndices ), s_MainMesh->GetBoneIndices(), GL_STATIC_DRAW );
-						glVertexAttribPointer( 6, AI_MAX_BONE_WEIGHTS, GL_UNSIGNED_INT, false, sizeof( Mesh::BoneIndices ), ( void* )0 );
+						glVertexAttribPointer( 6, AI_MAX_BONE_WEIGHTS, GL_INT, false, sizeof( Mesh::BoneIndices ), ( void* )0 );
 						glEnableVertexAttribArray( 6 );
 					} else glDisableVertexAttribArray( 6 );
 
@@ -189,6 +193,9 @@ void Rendering::Draw()
 
 					// Set light information.
 					s_MainShader->SetLights( s_Lights.data(), s_Lights.size() );
+
+					// Set bone information.
+					s_MainShader->SetBones( s_Bones.data(), s_Bones.size() );
 				}
 
 				// glDrawElements
@@ -218,6 +225,7 @@ void Rendering::Draw()
 void Rendering::End()
 {
 	s_Lights.clear();
+	s_Bones.clear();
 	glfwSwapBuffers( *Window::GetActive() );
 	glfwPollEvents();
 }

@@ -6,6 +6,7 @@
 
 RenderingApplication::RenderingApplication( const char* a_Window, glm::uvec2 a_Size )
 	: Application( a_Window, a_Size )
+	, m_Root( NullObject )
 { }
 
 void RenderingApplication::OnStart()

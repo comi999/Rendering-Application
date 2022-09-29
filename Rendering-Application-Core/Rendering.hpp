@@ -10,6 +10,10 @@
 #include "Material.hpp"
 #include "Camera.hpp"
 
+#define BUFFER_HANDLE_COUNT 9
+#define MAX_LIGHT_COUNT 4
+#define MAX_BONE_COUNT 300
+
 struct DrawCall
 {
 	Mesh* Mesh;
@@ -25,6 +29,7 @@ public:
 	static void Terminate();
 	static void Submit( const DrawCall& a_DrawCall );
 	static glm::mat4& AddLight();
+	static glm::mat4& AddBone();
 	static void Begin();
 	static void Draw();
 	static void End();
@@ -40,11 +45,12 @@ private:
 	static glm::vec4                s_ClearColour;
 	static std::list< DrawCall >    s_DrawCalls;
 	static std::vector< glm::mat4 > s_Lights;
+	static std::vector< glm::mat4 > s_Bones;
 	static Camera*                  s_MainCamera;
 	static const Mesh*              s_MainMesh;
 	static const Material*          s_MainMaterial;
 	static const Shader*            s_MainShader;
 
-	static GLuint s_ArrayHandle;
-	static GLuint s_BufferHandles[ 9 ];
+	static GLuint    s_ArrayHandle;
+	static GLuint    s_BufferHandles[ BUFFER_HANDLE_COUNT ];
 };

@@ -11,8 +11,8 @@ class Mesh : public Resource
 {
 public:
 
-	typedef glm::vec< AI_MAX_BONE_WEIGHTS, uint32_t > BoneIndices;
-	typedef glm::vec< AI_MAX_BONE_WEIGHTS, float    > BoneWeights;
+	typedef glm::vec< AI_MAX_BONE_WEIGHTS, int32_t > BoneIndices;
+	typedef glm::vec< AI_MAX_BONE_WEIGHTS, float   > BoneWeights;
 
 	Mesh() = default;
 	Mesh( const std::string& a_Path );

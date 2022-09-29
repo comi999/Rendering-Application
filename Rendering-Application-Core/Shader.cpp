@@ -100,6 +100,9 @@ bool Shader::Compile()
 	m_UniformLocationLights = glGetUniformLocation( m_ProgramHandle, "u_Lights" );
 	m_UniformLocationLightCount = glGetUniformLocation( m_ProgramHandle, "u_LightCount" );
 
+	m_UniformLocationBones = glGetUniformLocation( m_ProgramHandle, "u_Bones" );
+	m_UniformLocationBoneCount = glGetUniformLocation( m_ProgramHandle, "u_BoneCount" );
+
 	return true;
 }
 
@@ -130,11 +133,23 @@ bool Shader::SetLights( const glm::mat4* a_Lights, uint32_t a_LightCount ) const
 {
 	if ( m_UniformLocationLights == -1 || m_UniformLocationLightCount == -1 )
 	{
-		//return false;
+		//return false; // Because I'm not using LightCount in the shader.
 	}
 
 	glUniform1i( m_UniformLocationLightCount, a_LightCount );
 	glUniformMatrix4fv( m_UniformLocationLights, a_LightCount, false, &a_Lights[ 0 ][ 0 ][ 0 ] );
+	return true;
+}
+
+bool Shader::SetBones( const glm::mat4* a_Bones, uint32_t a_BoneCount ) const
+{
+	if ( m_UniformLocationBones == -1 || m_UniformLocationBoneCount == -1 )
+	{
+		//return false;
+	}
+
+	glUniform1i( m_UniformLocationBoneCount, a_BoneCount );
+	glUniformMatrix4fv( m_UniformLocationBones, a_BoneCount, false, &a_Bones[ 0 ][ 0 ][ 0 ] );
 	return true;
 }
 

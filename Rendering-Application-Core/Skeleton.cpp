@@ -1,5 +1,7 @@
-#include <queue>
+#include <map>
 #include <list>
+#include <string>
+#include <queue>
 #include <assimp/config.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -14,38 +16,125 @@ Skeleton::Skeleton( const std::string& a_Path )
 	Assimp::Importer Importer;
 	const aiScene* ThisScene = Importer.ReadFile( a_Path, 0 );
 	aiMesh* ThisMesh = ThisScene->mMeshes[ 0 ];
-	m_Bones.reserve( ThisMesh->mNumBones );
 
-	std::map< std::string, std::pair< aiNode*, aiBone* > > Lookup; // Name to ( Node/Bone )
-	std::queue< std::pair< aiNode*, int32_t > > ToSearch; // ( Node/Parent )
-	std::list< aiNode* > ToLink;
-	std::list< std::string > Names;
+	std::list< std::pair< aiBone*, aiNode* > > ToSearch;
+
 	for ( uint32_t i = 0; i < ThisMesh->mNumBones; ++i )
 	{
 		aiBone* ThisBone = ThisMesh->mBones[ i ];
 		aiNode* ThisNode = ThisScene->mRootNode->FindNode( ThisBone->mName );
-		Lookup[ ThisNode->mName.C_Str() ] = { ThisNode, ThisBone };
-		ToLink.push_back( ThisNode );
-		Names.push_back( ThisNode->mName.C_Str() ); // delete me
+		ToSearch.emplace_back( ThisBone, ThisNode );
 	}
-	return;
-	ToLink.sort( []( aiNode* a_A, aiNode* a_B ) { return a_A->FindNode( a_B->mName ); } );
-	ToSearch.emplace( ToLink.front(), -1 );
-	m_Bones.emplace_back().Parent = -1;
 
-	while ( !ToSearch.empty() )
+    struct Node
 	{
-		auto ThisNode = ToSearch.front(); ToSearch.pop();
-		Bone& NewBone = m_Bones.back();
-		NewBone.Name = ThisNode.first->mName.C_Str();
-		auto Iter = Lookup.find( ThisNode.first->mName.C_Str() );
-		Utility::Convert( Iter->second.second->mOffsetMatrix, NewBone.Offset );
-		Utility::Convert( ThisNode.first->mTransformation, NewBone.Local );
+		aiBone* Bone;
+		aiNode* This;
+		Node*   Parent;
+		std::vector< Node* > Children;
+	};
 
-		for ( uint32_t i = 0; i < ThisNode.first->mNumChildren; ++i )
+	std::map< std::string, Node > Dependencies;
+	Node* RootNode = nullptr;
+    uint32_t BoneCount = 0;
+
+	for ( auto& Pair : ToSearch )
+	{
+		aiNode* ThisNode = Pair.second;
+
+		Node* PrevNode = &( Dependencies[ ThisNode->mName.C_Str() ] =
 		{
-			m_Bones.emplace_back().Parent = ThisNode.second + 1;
-			ToSearch.emplace( ThisNode.first->mChildren[ i ], m_Bones.size() );
+			Pair.first,
+			Pair.second,
+			nullptr,
+			{}
+		} );
+
+        ++BoneCount;
+
+		do
+		{
+            ThisNode = ThisNode->mParent;
+			auto Iter = Dependencies.find( ThisNode->mName.C_Str() );
+
+			if ( Iter != Dependencies.end() )
+			{
+				Iter->second.Children.push_back( PrevNode );
+				PrevNode->Parent = &Iter->second;
+				break;
+			}
+
+			Node& NewNode = Dependencies[ ThisNode->mName.C_Str() ] =
+			{
+				nullptr,
+				ThisNode,
+				nullptr,
+				{}
+			};
+
+            ++BoneCount;
+			NewNode.Children.push_back( PrevNode );
+			PrevNode->Parent = &NewNode;
+            PrevNode = &NewNode;
+			ThisNode = ThisNode->mParent;
+
+            if ( !ThisNode )
+            {
+                RootNode = &NewNode;
+            }
+
+        } while ( ThisNode );
+	}
+
+    while ( RootNode && !RootNode->Bone )
+    {
+        RootNode = RootNode->Children[ 0 ];
+        --BoneCount;
+    }
+
+	m_Bones.reserve( BoneCount );
+	std::queue< std::pair< Node*, int32_t > > NodeQueue;
+	NodeQueue.push( { RootNode, -1 } );
+
+	while ( !NodeQueue.empty() )
+	{
+		Bone& ThisBone = m_Bones.emplace_back();
+		Node* ThisNode = NodeQueue.front().first;
+
+		ThisBone.Name = ThisNode->This->mName.C_Str();
+		ThisBone.Index = m_Bones.size() - 1u;
+		ThisBone.Parent = NodeQueue.front().second;
+		
+		Utility::Convert( ThisNode->This->mTransformation, ThisBone.Local );
+		//Utility::Convert( ThisNode->Bone ? ThisNode->Bone->mOffsetMatrix : aiMatrix4x4(), ThisBone.Offset );
+
+
+
+		if ( !ThisNode->Bone )
+		{
+			Node* Current = ThisNode;
+			glm::mat4 Local;
+
+			while ( Current != RootNode )
+			{
+				Utility::Convert( Current->This->mTransformation, Local );
+				ThisBone.Offset = Local * ThisBone.Offset;
+				Current = Current->Parent;
+			}
+
+			ThisBone.Offset = glm::inverse( ThisBone.Offset );
 		}
+		else
+		{
+			Utility::Convert( ThisNode->Bone->mOffsetMatrix, ThisBone.Offset );
+		}
+
+		for ( Node* Child : ThisNode->Children )
+		{
+			NodeQueue.push( { Child, ThisBone.Index } );
+		}
+
+		m_Names[ ThisBone.Name ] = ThisBone.Index;
+		NodeQueue.pop();
 	}
 }
