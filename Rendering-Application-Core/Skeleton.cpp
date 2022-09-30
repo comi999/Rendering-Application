@@ -138,3 +138,28 @@ Skeleton::Skeleton( const std::string& a_Path )
 		NodeQueue.pop();
 	}
 }
+
+void Skeleton::AddBone( const std::string& a_Name, int32_t a_Parent, const glm::mat4& a_Transform )
+{
+	if ( !( a_Parent < m_Bones.size() ) )
+	{
+		return;
+	}
+
+	Bone& NewBone = m_Bones.emplace_back();
+	NewBone.Name = a_Name;
+	NewBone.Index = m_Bones.size() - 1u;
+	NewBone.Parent = a_Parent;
+	NewBone.Local = a_Transform;
+	NewBone.Offset = a_Parent == -1 ? glm::mat4( 1.0f ) : glm::inverse( glm::inverse( m_Bones[ a_Parent ].Offset ) * a_Transform );
+}
+
+void Skeleton::AddBone( const std::string& a_Name, const std::string& a_Parent, const glm::mat4& a_Transform )
+{
+	auto Iter = std::find_if( m_Bones.begin(), m_Bones.end(), [&]( const Bone& a_Bone ) { return a_Bone.Name == a_Name; } );
+
+	if ( Iter != m_Bones.end() )
+	{
+		AddBone( a_Name, Iter->Index, a_Transform );
+	}
+}

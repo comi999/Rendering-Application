@@ -53,12 +53,14 @@ void Animator::SetSkeleton( const Skeleton* a_Skeleton )
 	{
 		m_BoneTransforms.resize( m_Skeleton->GetBoneCount() );
 
+		Object o = GetApplication()->Create();
+
 		for ( uint32_t i = 0; i < m_Skeleton->GetBoneCount(); ++i )
 		{
 			const Bone* ThisBone = ( *m_Skeleton )[ i ];
 			Object NewObject = GetApplication()->Create();
 			Transform* NewTransform = GetApplication()->GetComponent< Transform >( NewObject );
-			//LineRenderer* NewLineRenderer = GetApplication()->AddComponent< LineRenderer >( NewObject );
+			LineRenderer* NewLineRenderer = GetApplication()->AddComponent< LineRenderer >( NewObject );
 
 			glm::vec3 Scale;
 			glm::quat Rotation;
@@ -72,18 +74,19 @@ void Animator::SetSkeleton( const Skeleton* a_Skeleton )
 				Perspective );
 
 			NewTransform->SetPosition( Position );
-			//NewTransform->SetRotation( Rotation );
-			//NewTransform->SetScale( Scale );
+			NewTransform->SetRotation( Rotation );
+			NewTransform->SetScale( Scale );
 
 			m_BoneTransforms[ i ] = NewTransform;
 
 			if ( ThisBone->Parent < 0 )
 			{
-				ThisTransform->AttachChild( NewTransform, false );
+				//ThisTransform->AttachChild( NewTransform, false );
+				GetApplication()->GetComponent< Transform >(o )->AttachChild( NewTransform, true );
 				continue;
 			}
 
-			m_BoneTransforms[ ThisBone->Parent ]->AttachChild( NewTransform, false );
+			m_BoneTransforms[ ThisBone->Parent ]->AttachChild( NewTransform, true );
 		}
 	}
 }
@@ -138,6 +141,8 @@ void Animator::OnTick( float a_DeltaTime )
 	// .. Do the animation code.
 	for ( uint32_t i = 0; i < m_AnimationChannelContexts.size(); ++i )
 	{
+		if ( i >= m_Skeleton->GetBoneCount() ) break;
+
 		AnimationChannelContext& Context = m_AnimationChannelContexts[ i ];
 		Context += AttenuatedTime;
 		uint32_t BoneIndex = ( *m_Animation )[ i ]->BoneIndex;

@@ -8,6 +8,7 @@
 #include "ObjectRotator.hpp"
 #include "SoulSpearDemo.hpp"
 #include "AnimationDemo.hpp"
+#include "LineRenderer.hpp"
 
 class DemoController : public Component
 {
@@ -22,6 +23,10 @@ public:
 		// Add the demo components to them.
 		//GetApplication()->AddComponent< SoulSpearDemo >( m_Model0 );
 		GetApplication()->AddComponent< AnimationDemo >( m_Model1 );
+		//LineRenderer* SomeLineRenderer = GetApplication()->AddComponent< LineRenderer >( m_Model1 );
+		//SomeLineRenderer->Start = glm::vec3( 0, 0, 0 );
+		//SomeLineRenderer->End = glm::vec3( 1, 1, 1 );
+
 
 		// Add camera to DemoController object
 		m_Camera = GetApplication()->Create();

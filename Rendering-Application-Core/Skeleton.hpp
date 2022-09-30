@@ -21,6 +21,8 @@ public:
 
 	Skeleton() = default;
 	Skeleton( const std::string& a_Path );
+	void AddBone( const std::string& a_Name, int32_t a_Parent, const glm::mat4& a_Transform );
+	void AddBone( const std::string& a_Name, const std::string& a_Parent, const glm::mat4& a_Transform );
 	size_t GetBoneCount() const { return m_Bones.size(); }
 	const Bone* GetBones() const { return m_Bones.data(); }
 	const Bone* GetRootBone() const { return m_Bones.data(); }

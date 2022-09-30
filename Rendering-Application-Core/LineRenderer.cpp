@@ -2,6 +2,7 @@
 #include "Rendering.hpp"
 #include "Application.hpp"
 #include "Transform.hpp"
+#include "Utilities.hpp"
 
 void LineRenderer::Submit()
 {
@@ -11,14 +12,19 @@ void LineRenderer::Submit()
 	static Utility::OnStart s_OnStart = []()
 	{
 		s_LineMesh.AddPosition( { 1.0f, 0.0f, 0.0f, 1.0f } );
+		s_LineMesh.AddPosition( { 1.0f, 0.01f, 0.0f, 1.0f } );
+		s_LineMesh.AddPosition( { 0.0f, 0.01f, 0.0f, 1.0f } );
 		s_LineMesh.AddPosition( { 0.0f, 0.0f, 0.0f, 1.0f } );
-		s_LineMesh.AddPosition( { 0.0f, 0.0f, 0.0f, 1.0f } );
+		s_LineMesh.AddColour( { 1.0f, 1.0f, 1.0f, 1.0f } );
 		s_LineMesh.AddColour( { 1.0f, 1.0f, 1.0f, 1.0f } );
 		s_LineMesh.AddColour( { 1.0f, 1.0f, 1.0f, 1.0f } );
 		s_LineMesh.AddColour( { 1.0f, 1.0f, 1.0f, 1.0f } );
 		s_LineMesh.AddIndex( 0 );
 		s_LineMesh.AddIndex( 1 );
 		s_LineMesh.AddIndex( 2 );
+		s_LineMesh.AddIndex( 0 );
+		s_LineMesh.AddIndex( 2 );
+		s_LineMesh.AddIndex( 3 );
 
 		s_LineShader = Shader( "Resources/LineRenderer.shader" );
 		s_LineShader.Compile();
