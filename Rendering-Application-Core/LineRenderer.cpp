@@ -15,10 +15,10 @@ void LineRenderer::Submit()
 		s_LineMesh.AddPosition( { 1.0f, 0.01f, 0.0f, 1.0f } );
 		s_LineMesh.AddPosition( { 0.0f, 0.01f, 0.0f, 1.0f } );
 		s_LineMesh.AddPosition( { 0.0f, 0.0f, 0.0f, 1.0f } );
-		s_LineMesh.AddColour( { 1.0f, 1.0f, 1.0f, 1.0f } );
-		s_LineMesh.AddColour( { 1.0f, 1.0f, 1.0f, 1.0f } );
-		s_LineMesh.AddColour( { 1.0f, 1.0f, 1.0f, 1.0f } );
-		s_LineMesh.AddColour( { 1.0f, 1.0f, 1.0f, 1.0f } );
+		s_LineMesh.AddColour( { 1.0f, 0.0f, 0.0f, 1.0f } );
+		s_LineMesh.AddColour( { 1.0f, 0.0f, 0.0f, 1.0f } );
+		s_LineMesh.AddColour( { 0.0f, 0.0f, 1.0f, 1.0f } );
+		s_LineMesh.AddColour( { 0.0f, 0.0f, 1.0f, 1.0f } );
 		s_LineMesh.AddIndex( 0 );
 		s_LineMesh.AddIndex( 1 );
 		s_LineMesh.AddIndex( 2 );

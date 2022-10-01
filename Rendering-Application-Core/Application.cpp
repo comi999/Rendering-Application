@@ -62,7 +62,7 @@ void Application::Run()
 		PatchComponents< Transform >( []( Transform& a_Transform ) { a_Transform.Update(); } );
 
 		// Query all renderers to submit draw calls.
-		PatchComponents< Renderer >( []( Renderer& a_Renderer ) { a_Renderer.Submit(); } );
+		//PatchComponents< Renderer >( []( Renderer& a_Renderer ) { a_Renderer.Submit(); } );
 
 		// Query all line renderers to submit draw calls.
 		PatchComponents< LineRenderer >( []( LineRenderer& a_LineRenderer ) { a_LineRenderer.Submit(); } );

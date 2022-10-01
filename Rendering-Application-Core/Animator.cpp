@@ -14,26 +14,13 @@ Animator::Animator()
 
 void Animator::BuildMatrix( glm::mat4& o_BoneMatrix, uint32_t a_BoneIndex ) const
 {
-	//o_BoneMatrix =
+	o_BoneMatrix =
 	//	//glm::inverse( GetApplication()->GetComponent< Transform >( GetObject() )->GetGlobal() ) *
 	//	
 	//	glm::mat4( 1.0f ) *
 	//	//m_BoneTransforms[ a_BoneIndex ]->GetGlobal() *
 
-	//	( *m_Skeleton )[ a_BoneIndex ]->Offset;
-	//	//glm::mat4( 1.0f );
-
-	glm::mat4 Local( 1.0f );
-
-	Transform* t = m_BoneTransforms[ a_BoneIndex ];
-
-	while ( t )
-	{
-		Local = t->GetLocal() * Local;
-		t = t->GetParent();
-	}
-
-	o_BoneMatrix = Local * ( *m_Skeleton )[ a_BoneIndex ]->Offset;
+		( *m_Skeleton )[ a_BoneIndex ]->Offset;
 }
 
 void Animator::SetSkeleton( const Skeleton* a_Skeleton )
@@ -52,8 +39,6 @@ void Animator::SetSkeleton( const Skeleton* a_Skeleton )
 	if ( m_Skeleton )
 	{
 		m_BoneTransforms.resize( m_Skeleton->GetBoneCount() );
-
-		Object o = GetApplication()->Create();
 
 		for ( uint32_t i = 0; i < m_Skeleton->GetBoneCount(); ++i )
 		{
@@ -81,12 +66,12 @@ void Animator::SetSkeleton( const Skeleton* a_Skeleton )
 
 			if ( ThisBone->Parent < 0 )
 			{
-				//ThisTransform->AttachChild( NewTransform, false );
-				GetApplication()->GetComponent< Transform >(o )->AttachChild( NewTransform, true );
+				ThisTransform->AttachChild( NewTransform, false );
 				continue;
 			}
 
-			m_BoneTransforms[ ThisBone->Parent ]->AttachChild( NewTransform, true );
+			m_BoneTransforms[ ThisBone->Parent ]->AttachChild( NewTransform, false );
+			bool r = NewTransform;
 		}
 	}
 }

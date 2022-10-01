@@ -14,6 +14,7 @@
 #include "Animation.hpp"
 #include "Animator.hpp"
 #include "ObjectRotator.hpp"
+#include "LineRenderer.hpp"
 
 class AnimationDemo : public Component
 {
@@ -38,6 +39,8 @@ public:
 		SomeSkeleton->AddBone( "Leg2", "Leg1", glm::translate( glm::mat4( 1.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ) ) );
 		SomeSkeleton->AddBone( "Leg3", "Leg2", glm::translate( glm::mat4( 1.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ) ) );
 
+		//LineRenderer* SomeLineRenderer = GetApplication()->AddComponent< LineRenderer >( GetObject() );
+
 		SomeAnimation = new Animation( "Resources/Animation_Test.fbx" );
 
 		Animator* SomeAnimator = GetApplication()->AddComponent< Animator >( GetObject() );
@@ -45,7 +48,7 @@ public:
 		SomeAnimator->SetAnimation( SomeAnimation );
 		SomeAnimator->Repeat( true );
 		SomeAnimator->SetPlaybackSpeed( 12.0f );
-		SomeAnimator->Play();
+		//SomeAnimator->Play();
 
 		SomeMaterial = new Material();
 		SomeMaterial->SetShader( SomeShader );

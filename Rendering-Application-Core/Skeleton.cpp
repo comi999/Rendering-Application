@@ -141,7 +141,7 @@ Skeleton::Skeleton( const std::string& a_Path )
 
 void Skeleton::AddBone( const std::string& a_Name, int32_t a_Parent, const glm::mat4& a_Transform )
 {
-	if ( !( a_Parent < m_Bones.size() ) )
+	if ( a_Parent != -1 && !( a_Parent < m_Bones.size() ) )
 	{
 		return;
 	}
@@ -156,7 +156,10 @@ void Skeleton::AddBone( const std::string& a_Name, int32_t a_Parent, const glm::
 
 void Skeleton::AddBone( const std::string& a_Name, const std::string& a_Parent, const glm::mat4& a_Transform )
 {
-	auto Iter = std::find_if( m_Bones.begin(), m_Bones.end(), [&]( const Bone& a_Bone ) { return a_Bone.Name == a_Name; } );
+	auto Iter = std::find_if( m_Bones.begin(), m_Bones.end(), [&]( const Bone& a_Bone ) 
+	{ 
+		return a_Bone.Name == a_Parent; 
+	} );
 
 	if ( Iter != m_Bones.end() )
 	{
