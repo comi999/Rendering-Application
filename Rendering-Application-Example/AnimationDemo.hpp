@@ -22,18 +22,18 @@ public:
 
 	void OnCreate()
 	{
-		GetApplication()->GetComponent< Transform >( GetObject() )->SetScale( glm::vec3{ 0.02f, 0.02f, 0.02f } * 10.0f );
+		GetApplication()->GetComponent< Transform >( GetObject() )->SetScale( glm::vec3{ 0.02f, 0.02f, 0.02f } );
 
 		SomeTextureDiffuse = new Texture( "Resources/SoulSpear/soulspear_diffuse.tga", TextureType_Diffuse );
 		//SomeTextureNormal = new Texture( "Resources/SoulSpear/soulspear_normal.tga", TextureType_Normal );
 		//SomeTextureSpecular = new Texture( "Resources/SoulSpear/soulspear_specular.tga", TextureType_Specular );
 		
 		SomeShader = new Shader( "Resources/Animation_Test.shader" );
+		//SomeShader = new Shader( "Resources/SoulSpear.shader" );
 		SomeShader->Compile();
 
 		SomeMesh = new Mesh( "Resources/Animation_Test.fbx" );
 		SomeSkeleton = new Skeleton( "Resources/Animation_Test.fbx" );
-
 		SomeAnimation = new Animation( "Resources/Animation_Test.fbx" );
 
 		Animator* SomeAnimator = GetApplication()->AddComponent< Animator >( GetObject() );

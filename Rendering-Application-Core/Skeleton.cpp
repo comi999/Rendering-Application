@@ -106,7 +106,7 @@ Skeleton::Skeleton( const std::string& a_Path )
 		ThisBone.Parent = NodeQueue.front().second;
 		
 		Utility::Convert( ThisNode->This->mTransformation, ThisBone.Local );
-		//Utility::Convert( ThisNode->Bone ? ThisNode->Bone->mOffsetMatrix : aiMatrix4x4(), ThisBone.Offset );
+		Utility::Convert( ThisNode->Bone ? ThisNode->Bone->mOffsetMatrix : aiMatrix4x4(), ThisBone.Offset );
 
 
 

@@ -42,7 +42,7 @@ void Animator::SetSkeleton( const Skeleton* a_Skeleton )
 			const Bone* ThisBone = ( *m_Skeleton )[ i ];
 			Object NewObject = GetApplication()->Create();
 			Transform* NewTransform = GetApplication()->GetComponent< Transform >( NewObject );
-			LineRenderer* NewLineRenderer = GetApplication()->AddComponent< LineRenderer >( NewObject );
+			GetApplication()->AddComponent< LineRenderer >( NewObject )->SetEnabled( false );
 
 			glm::vec3 Scale;
 			glm::quat Rotation;

@@ -59,20 +59,22 @@ void Application::Run()
 		// Setup rendering for frame.
 		Rendering::Begin();
 
-		PatchComponents< Transform >( []( Transform& a_Transform ) { a_Transform.Update(); } );
+		PatchComponents< Transform >( []( Transform& a_Transform ) { if ( a_Transform.IsEnabled() ) a_Transform.Update(); } );
 
 		// Query all renderers to submit draw calls.
-		PatchComponents< Renderer >( []( Renderer& a_Renderer ) { a_Renderer.Submit(); } );
+		PatchComponents< Renderer >( []( Renderer& a_Renderer ) { if ( a_Renderer.IsEnabled() ) a_Renderer.Submit(); } );
 
 		// Query all line renderers to submit draw calls.
-		//PatchComponents< LineRenderer >( []( LineRenderer& a_LineRenderer ) { a_LineRenderer.Submit(); } );
+		PatchComponents< LineRenderer >( []( LineRenderer& a_LineRenderer ) { if ( a_LineRenderer.IsEnabled() ) a_LineRenderer.Submit(); } );
 
 		// Query all lights to submit.
-		PatchComponents< Light >( []( Light& a_Light ) { a_Light.BuildMatrix( Rendering::AddLight() ); } );
+		PatchComponents< Light >( []( Light& a_Light ) { if ( a_Light.IsEnabled() ) a_Light.BuildMatrix( Rendering::AddLight() ); } );
 
 		// Query all Animator's to submit bones.
 		PatchComponents< Animator >( []( Animator& a_Animator ) 
 		{
+			if ( !a_Animator.IsEnabled() ) return;
+
 			for ( uint32_t i = 1; i < a_Animator.GetSkeleton()->GetBoneCount(); ++i )
 			{
 				a_Animator.BuildMatrix( Rendering::AddBone(), i );

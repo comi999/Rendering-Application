@@ -3,18 +3,6 @@
 #include "Application.hpp"
 #include "Transform.hpp"
 
-void Renderer::OnCreate() { }
-
-void Renderer::OnTick( float a_DeltaTime )
-{
-	
-}
-
-void Renderer::OnDestroy()
-{
-
-}
-
 void Renderer::Submit()
 {
 	Application* ThisApplication = GetApplication();

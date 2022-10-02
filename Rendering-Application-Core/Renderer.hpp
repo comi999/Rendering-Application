@@ -10,9 +10,6 @@ class Renderer : public Component
 {
 public:
 
-	void OnCreate();
-	void OnTick(float a_DeltaTime );
-	void OnDestroy();
 	void Submit();
 	void SetMesh( Mesh* a_Mesh ) { m_Mesh = a_Mesh; }
 	Mesh* GetMesh() { return m_Mesh; }

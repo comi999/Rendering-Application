@@ -23,22 +23,6 @@ public:
 		// Add the demo components to them.
 		//GetApplication()->AddComponent< SoulSpearDemo >( m_Model0 );
 		GetApplication()->AddComponent< AnimationDemo >( m_Model1 );
-		/*LineRenderer* SomeLineRenderer0 = GetApplication()->AddComponent< LineRenderer >( GetApplication()->Create() );
-		LineRenderer* SomeLineRenderer1 = GetApplication()->AddComponent< LineRenderer >( GetApplication()->Create() );
-		LineRenderer* SomeLineRenderer2 = GetApplication()->AddComponent< LineRenderer >( GetApplication()->Create() );
-		LineRenderer* SomeLineRenderer3 = GetApplication()->AddComponent< LineRenderer >( GetApplication()->Create() );
-
-		GetApplication()->GetComponent< Transform >( SomeLineRenderer1->GetObject() )->SetPosition( { 2, 0, 0 } );
-		GetApplication()->GetComponent< Transform >( SomeLineRenderer2->GetObject() )->SetPosition( { 2, 0, 0 } );
-		GetApplication()->GetComponent< Transform >( SomeLineRenderer3->GetObject() )->SetPosition( { 2, 0, 0 } );
-
-		GetApplication()->GetComponent< Transform >( SomeLineRenderer1->GetObject() )->SetParent( GetApplication()->GetComponent< Transform >( SomeLineRenderer0->GetObject() ), false );
-		GetApplication()->GetComponent< Transform >( SomeLineRenderer2->GetObject() )->SetParent( GetApplication()->GetComponent< Transform >( SomeLineRenderer1->GetObject() ), false );
-		GetApplication()->GetComponent< Transform >( SomeLineRenderer3->GetObject() )->SetParent( GetApplication()->GetComponent< Transform >( SomeLineRenderer2->GetObject() ), false );*/
-		
-		//SomeLineRenderer->Start = glm::vec3( 0, 0, 0 );
-		//SomeLineRenderer->End = glm::vec3( 1, 1, 1 );
-
 
 		// Add camera to DemoController object
 		m_Camera = GetApplication()->Create();

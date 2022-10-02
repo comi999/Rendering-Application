@@ -89,14 +89,14 @@ protected:
 private:
 
 	template < typename T > static void UpdateComponents( Application* a_Application, float a_DeltaTime );
-	template < typename T > Updater AssureUpdater();
+	template < typename T > static Updater AssureUpdater();
 	void UpdateAllComponents( float a_DeltaTime );
 
-	bool                       m_Running;
-	Window*                    m_Window;
-	Object                     m_MainCamera;
-	entt::registry             m_Registry;
-	std::vector< Updater >     m_Updaters;
+	bool                          m_Running;
+	Window*                       m_Window;
+	Object                        m_MainCamera;
+	entt::registry                m_Registry;
+	static std::vector< Updater > s_Updaters;
 };
 
 template < typename T >

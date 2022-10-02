@@ -46,6 +46,8 @@ public:
 
 	Object GetObject() const { return m_Object; }
 	Application* GetApplication() const { return m_Application; }
+	inline bool IsEnabled() const { return m_Enabled; }
+	inline bool SetEnabled( bool a_Enabled ) { m_Enabled = a_Enabled; }
 
 private:
 
@@ -53,4 +55,5 @@ private:
 
 	Object       m_Object;
 	Application* m_Application;
+	bool         m_Enabled;
 };

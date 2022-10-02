@@ -205,7 +205,7 @@ void Rendering::Draw()
 					glDrawElements( GL_TRIANGLES, s_MainMesh->GetIndexCount(), GL_UNSIGNED_INT, ( void* )0 );
 					glBindVertexArray( 0 );
 					glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-					glUseProgram( 0 );
+					//glUseProgram( 0 );
 				}
 
 				// glDrawArray
@@ -214,7 +214,7 @@ void Rendering::Draw()
 					glBindVertexArray( s_ArrayHandle );
 					glDrawArrays( GL_TRIANGLES, 0, s_MainMesh->GetVertexCount() );
 					glBindVertexArray( 0 );
-					glUseProgram( 0 );
+					//glUseProgram( 0 );
 				}
 			}
 		}
