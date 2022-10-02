@@ -15,11 +15,6 @@ void RenderingApplication::OnStart()
 	AddComponent< DemoController >( m_Root );
 }
 
-void RenderingApplication::OnTick( float a_DeltaTime )
-{
-	
-}
-
 void RenderingApplication::OnStop()
 {
 

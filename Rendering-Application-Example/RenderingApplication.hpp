@@ -11,7 +11,6 @@ public:
 protected:
 
 	void OnStart() override;
-	void OnTick( float a_DeltaTime ) override;
 	void OnStop() override;
 
 private:

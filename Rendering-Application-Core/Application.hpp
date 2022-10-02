@@ -51,9 +51,18 @@ private:
 		static constexpr bool Value = sizeof( test< T >( 0 ) ) == sizeof( char );
 	};
 
+	template < typename T >
+	struct HasOnRender
+	{
+		template < typename U > static char test( decltype( &U::OnRender ) );
+		template < typename U > static long test( ... );
+		static constexpr bool Value = sizeof( test< T >( 0 ) ) == sizeof( char );
+	};
+
 public:
 
-	typedef void( *Updater )( Application*, float );
+	typedef void( *OnTickFunction   )( Application*, float );
+	typedef void( *OnRenderFunction )( Application* );
 
 	Application( const char* a_Title, glm::uvec2 a_Size );
 	virtual ~Application();
@@ -67,42 +76,43 @@ public:
 	void Destroy( Object a_Object );
 	Camera* GetMainCamera();
 	void SetMainCamera( Camera* a_Camera );
-
-	template < typename T >
-	T* AddComponent( Object a_Object );
-
-	template < typename T >
-	T* GetComponent( Object a_Object );
-
-	template < typename T >
-	void DestroyComponent( Object a_Object );
-
-	template < typename T, typename Func >
-	void PatchComponents( Func a_Patcher );
+	template < typename T > T* AddComponent( Object a_Object );
+	template < typename T > T* GetComponent( Object a_Object );
+	template < typename T > void DestroyComponent( Object a_Object );
+	template < typename T, typename Func > void PatchComponents( Func a_Patcher );
 
 protected:
 
 	virtual void OnStart() = 0;
-	virtual void OnTick( float a_DeltaTime ) = 0;
 	virtual void OnStop() = 0;
 
 private:
 
-	template < typename T > static void UpdateComponents( Application* a_Application, float a_DeltaTime );
-	template < typename T > static Updater AssureUpdater();
-	void UpdateAllComponents( float a_DeltaTime );
+	template < typename T > static void RunAllOnTick( Application* a_Application, float a_DeltaTime );
+	template < typename T > static void RunAllOnRender( Application* a_Application );
+	template < typename T > static OnTickFunction AssureOnTick();
+	template < typename T > static OnRenderFunction AssureOnRender();
+	void OnTick( float a_DeltaTime );
+	void OnRender();
 
-	bool                          m_Running;
-	Window*                       m_Window;
-	Object                        m_MainCamera;
-	entt::registry                m_Registry;
-	static std::vector< Updater > s_Updaters;
+	bool                                   m_Running;
+	Window*                                m_Window;
+	Object                                 m_MainCamera;
+	entt::registry                         m_Registry;
+	static std::vector< OnTickFunction   > s_OnTickFunctions;
+	static std::vector< OnRenderFunction > s_OnRenderFunctions;
 };
 
 template < typename T >
 T* Application::AddComponent( Object a_Object )
 {
-	AssureUpdater< T >();
+	static bool Setup = []() 
+	{ 
+		AssureOnTick< T >();
+		AssureOnRender< T >();
+		return true; 
+	}();
+
 	T* New = &m_Registry.emplace_or_replace< T >( a_Object );
 	New->m_Application = this;
 	New->m_Object = a_Object;
@@ -139,25 +149,49 @@ void Application::PatchComponents( Func a_Patcher )
 }
 
 template < typename T >
-void Application::UpdateComponents( Application* a_Application, float a_DeltaTime )
+void Application::RunAllOnTick( Application* a_Application, float a_DeltaTime )
 {
 	if constexpr ( HasOnTick< T >::Value )
 	{
-		a_Application->m_Registry.view< T >().each( [&]( T& a_Component )
+		a_Application->PatchComponents< T >( [&]( T& a_Component )
 		{
-			a_Component.OnTick( a_DeltaTime );
+			if ( a_Component.IsEnabled() ) a_Component.OnTick( a_DeltaTime );
 		} );
 	}
 }
 
 template < typename T >
-Application::Updater Application::AssureUpdater()
+void Application::RunAllOnRender( Application* a_Application )
 {
-	if ( !( Application::Indexer::Index< T >() < m_Updaters.size() ) )
+	if constexpr ( HasOnRender< T >::Value )
 	{
-		m_Updaters.resize( Application::Indexer::Index< T >() + 1u );
+		a_Application->PatchComponents< T >( [&]( T& a_Component )
+		{
+			if ( a_Component.IsEnabled() ) a_Component.OnRender();
+		} );
+	}
+}
+
+template < typename T >
+Application::OnTickFunction Application::AssureOnTick()
+{
+	if ( !( Application::Indexer::Index< T >() < s_OnTickFunctions.size() ) )
+	{
+		s_OnTickFunctions.resize( Application::Indexer::Index< T >() + 1u );
 	}
 
-	m_Updaters[ Application::Indexer::Index< T >() ] = Application::UpdateComponents< T >;
-	return Application::UpdateComponents< T >;
+	s_OnTickFunctions[ Application::Indexer::Index< T >() ] = Application::RunAllOnTick< T >;
+	return Application::RunAllOnTick< T >;
+}
+
+template < typename T >
+Application::OnRenderFunction Application::AssureOnRender()
+{
+	if ( !( Application::Indexer::Index< T >() < s_OnRenderFunctions.size() ) )
+	{
+		s_OnRenderFunctions.resize( Application::Indexer::Index< T >() + 1u );
+	}
+
+	s_OnRenderFunctions[ Application::Indexer::Index< T >() ] = Application::RunAllOnRender< T >;
+	return Application::RunAllOnRender< T >;
 }

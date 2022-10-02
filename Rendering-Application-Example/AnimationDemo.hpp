@@ -42,6 +42,7 @@ public:
 		SomeAnimator->Repeat( true );
 		SomeAnimator->SetPlaybackSpeed( 12.0f );
 		SomeAnimator->Play();
+		SomeAnimator->DebugEnabled( true );
 
 		SomeMaterial = new Material();
 		SomeMaterial->SetShader( SomeShader );

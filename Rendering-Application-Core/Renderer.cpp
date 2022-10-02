@@ -3,7 +3,7 @@
 #include "Application.hpp"
 #include "Transform.hpp"
 
-void Renderer::Submit()
+void Renderer::OnRender()
 {
 	Application* ThisApplication = GetApplication();
 	Transform* ThisTransform = ThisApplication->GetComponent< Transform >( GetObject() );

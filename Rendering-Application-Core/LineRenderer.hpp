@@ -12,7 +12,6 @@ class LineRenderer : public Component
 public:
 
 	void SetStartEnd( const glm::vec3& a_Start, const glm::vec3& a_End );
-
-	void Submit();
+	void OnRender();
 
 };

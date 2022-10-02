@@ -9,6 +9,8 @@ class Animator : public Component
 public:
 
 	Animator();
+	inline bool IsDebugEnabled() const { return m_IsDebugEnabled; }
+	void DebugEnabled( bool a_Enabled );
 	void BuildMatrix( glm::mat4& o_BoneMatrix, uint32_t a_BoneIndex ) const;
 	void SetSkeleton( const Skeleton* a_Skeleton );
 	void SetAnimation( const Animation* a_Animation );
@@ -27,6 +29,7 @@ public:
 
 private:
 
+	bool                                        m_IsDebugEnabled;
 	bool                                        m_IsPlaying;
 	bool                                        m_IsRepeating;
 	float                                       m_ElapsedTime;

@@ -15,7 +15,7 @@ void LineRenderer::SetStartEnd( const glm::vec3& a_Start, const glm::vec3& a_End
 	ThisTransform->SetScale( { Scale, 1.0f, 1.0f } );
 }
 
-void LineRenderer::Submit()
+void LineRenderer::OnRender()
 {
 	// This is a crap way to do this, this should be a resource
 	static Mesh s_LineMesh;

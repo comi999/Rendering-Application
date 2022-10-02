@@ -12,6 +12,22 @@ Animator::Animator()
 	, m_Animation( nullptr )
 { }
 
+void Animator::DebugEnabled( bool a_Enabled )
+{
+	if ( a_Enabled == m_IsDebugEnabled )
+	{
+		return;
+	}
+
+	m_IsDebugEnabled = a_Enabled;
+	Application* ThisApplication = GetApplication();
+
+	for ( auto& ChildBone : m_BoneTransforms )
+	{
+		ThisApplication->GetComponent< LineRenderer >( ChildBone )->SetEnabled( m_IsDebugEnabled );
+	}
+}
+
 void Animator::BuildMatrix( glm::mat4& o_BoneMatrix, uint32_t a_BoneIndex ) const
 {
 	o_BoneMatrix =
@@ -42,7 +58,7 @@ void Animator::SetSkeleton( const Skeleton* a_Skeleton )
 			const Bone* ThisBone = ( *m_Skeleton )[ i ];
 			Object NewObject = GetApplication()->Create();
 			Transform* NewTransform = GetApplication()->GetComponent< Transform >( NewObject );
-			GetApplication()->AddComponent< LineRenderer >( NewObject )->SetEnabled( false );
+			GetApplication()->AddComponent< LineRenderer >( NewObject )->SetEnabled( m_IsDebugEnabled );
 
 			glm::vec3 Scale;
 			glm::quat Rotation;
@@ -129,5 +145,13 @@ void Animator::OnTick( float a_DeltaTime )
 		BoneTransform->SetPosition( Context.GetPosition() );
 		BoneTransform->SetRotation( Context.GetRotation() );
 		BoneTransform->SetScale( Context.GetScale() );
+
+		if ( m_IsDebugEnabled && i > 0 )
+		{
+			const glm::mat4& GlobalTransform = BoneTransform->GetGlobal();
+			glm::vec3 Start = BoneTransform->GetParent()->GetGlobal()[ 3 ];
+			glm::vec3 End = BoneTransform->GetGlobal()[ 3 ];
+			GetApplication()->GetComponent< LineRenderer >( GetObject() )->SetStartEnd( Start, End );
+		}
 	}
 }
