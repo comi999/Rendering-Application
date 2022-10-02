@@ -22,7 +22,7 @@ public:
 
 	void OnCreate()
 	{
-		//GetApplication()->GetComponent< Transform >( GetObject() )->SetScale( { 0.02f, 0.02f, 0.02f } );
+		GetApplication()->GetComponent< Transform >( GetObject() )->SetScale( glm::vec3{ 0.02f, 0.02f, 0.02f } * 10.0f );
 
 		SomeTextureDiffuse = new Texture( "Resources/SoulSpear/soulspear_diffuse.tga", TextureType_Diffuse );
 		//SomeTextureNormal = new Texture( "Resources/SoulSpear/soulspear_normal.tga", TextureType_Normal );
@@ -32,14 +32,7 @@ public:
 		SomeShader->Compile();
 
 		SomeMesh = new Mesh( "Resources/Animation_Test.fbx" );
-		//SomeSkeleton = new Skeleton( "Resources/Animation_Test.fbx" );
-		SomeSkeleton = new Skeleton();
-		SomeSkeleton->AddBone( "Hip", -1, glm::mat4( 1.0f ) );
-		SomeSkeleton->AddBone( "Leg1", "Hip", glm::translate( glm::mat4( 1.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ) ) );
-		SomeSkeleton->AddBone( "Leg2", "Leg1", glm::translate( glm::mat4( 1.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ) ) );
-		SomeSkeleton->AddBone( "Leg3", "Leg2", glm::translate( glm::mat4( 1.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ) ) );
-
-		//LineRenderer* SomeLineRenderer = GetApplication()->AddComponent< LineRenderer >( GetObject() );
+		SomeSkeleton = new Skeleton( "Resources/Animation_Test.fbx" );
 
 		SomeAnimation = new Animation( "Resources/Animation_Test.fbx" );
 
@@ -48,7 +41,7 @@ public:
 		SomeAnimator->SetAnimation( SomeAnimation );
 		SomeAnimator->Repeat( true );
 		SomeAnimator->SetPlaybackSpeed( 12.0f );
-		//SomeAnimator->Play();
+		SomeAnimator->Play();
 
 		SomeMaterial = new Material();
 		SomeMaterial->SetShader( SomeShader );

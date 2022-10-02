@@ -15,11 +15,8 @@ Animator::Animator()
 void Animator::BuildMatrix( glm::mat4& o_BoneMatrix, uint32_t a_BoneIndex ) const
 {
 	o_BoneMatrix =
-	//	//glm::inverse( GetApplication()->GetComponent< Transform >( GetObject() )->GetGlobal() ) *
-	//	
-	//	glm::mat4( 1.0f ) *
-	//	//m_BoneTransforms[ a_BoneIndex ]->GetGlobal() *
-
+		glm::inverse( GetApplication()->GetComponent< Transform >( GetObject() )->GetGlobal() ) *
+		m_BoneTransforms[ a_BoneIndex ]->GetGlobal() *
 		( *m_Skeleton )[ a_BoneIndex ]->Offset;
 }
 
@@ -71,7 +68,6 @@ void Animator::SetSkeleton( const Skeleton* a_Skeleton )
 			}
 
 			m_BoneTransforms[ ThisBone->Parent ]->AttachChild( NewTransform, false );
-			bool r = NewTransform;
 		}
 	}
 }
@@ -126,8 +122,6 @@ void Animator::OnTick( float a_DeltaTime )
 	// .. Do the animation code.
 	for ( uint32_t i = 0; i < m_AnimationChannelContexts.size(); ++i )
 	{
-		if ( i >= m_Skeleton->GetBoneCount() ) break;
-
 		AnimationChannelContext& Context = m_AnimationChannelContexts[ i ];
 		Context += AttenuatedTime;
 		uint32_t BoneIndex = ( *m_Animation )[ i ]->BoneIndex;

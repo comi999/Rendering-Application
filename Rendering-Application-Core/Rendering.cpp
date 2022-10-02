@@ -7,7 +7,6 @@
 #include "Camera.hpp"
 #include "Material.hpp"
 
-
 Window*                  Rendering::s_Window = nullptr;
 glm::vec4                Rendering::s_ClearColour;
 std::list< DrawCall >    Rendering::s_DrawCalls;

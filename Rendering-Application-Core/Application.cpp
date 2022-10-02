@@ -62,10 +62,10 @@ void Application::Run()
 		PatchComponents< Transform >( []( Transform& a_Transform ) { a_Transform.Update(); } );
 
 		// Query all renderers to submit draw calls.
-		//PatchComponents< Renderer >( []( Renderer& a_Renderer ) { a_Renderer.Submit(); } );
+		PatchComponents< Renderer >( []( Renderer& a_Renderer ) { a_Renderer.Submit(); } );
 
 		// Query all line renderers to submit draw calls.
-		PatchComponents< LineRenderer >( []( LineRenderer& a_LineRenderer ) { a_LineRenderer.Submit(); } );
+		//PatchComponents< LineRenderer >( []( LineRenderer& a_LineRenderer ) { a_LineRenderer.Submit(); } );
 
 		// Query all lights to submit.
 		PatchComponents< Light >( []( Light& a_Light ) { a_Light.BuildMatrix( Rendering::AddLight() ); } );
@@ -73,7 +73,7 @@ void Application::Run()
 		// Query all Animator's to submit bones.
 		PatchComponents< Animator >( []( Animator& a_Animator ) 
 		{
-			for ( uint32_t i = 0; i < a_Animator.GetSkeleton()->GetBoneCount(); ++i )
+			for ( uint32_t i = 1; i < a_Animator.GetSkeleton()->GetBoneCount(); ++i )
 			{
 				a_Animator.BuildMatrix( Rendering::AddBone(), i );
 			}
