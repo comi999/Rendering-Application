@@ -25,16 +25,20 @@ public:
 		GetApplication()->GetComponent< Transform >( GetObject() )->SetScale( glm::vec3{ 0.02f, 0.02f, 0.02f } );
 
 		SomeTextureDiffuse = new Texture( "Resources/SoulSpear/soulspear_diffuse.tga", TextureType_Diffuse );
-		//SomeTextureNormal = new Texture( "Resources/SoulSpear/soulspear_normal.tga", TextureType_Normal );
-		//SomeTextureSpecular = new Texture( "Resources/SoulSpear/soulspear_specular.tga", TextureType_Specular );
-		
-		SomeShader = new Shader( "Resources/Animation_Test.shader" );
-		//SomeShader = new Shader( "Resources/SoulSpear.shader" );
-		SomeShader->Compile();
 
+		SomeShader = new Shader( "Resources/Animation_Test.shader" );
+		SomeShader->Compile();
+		
 		SomeMesh = new Mesh( "Resources/Animation_Test.fbx" );
 		SomeSkeleton = new Skeleton( "Resources/Animation_Test.fbx" );
 		SomeAnimation = new Animation( "Resources/Animation_Test.fbx" );
+
+		/*SomeMesh = new Mesh( "Resources/Taunt2.fbx" );
+		SomeSkeleton = new Skeleton( "Resources/Taunt2.fbx" );
+		SomeAnimation = new Animation( "Resources/Taunt2.fbx" );*/
+		/*SomeMesh = new Mesh( "Resources/AnimTest.fbx" );
+		SomeSkeleton = new Skeleton( "Resources/AnimTest.fbx" );
+		SomeAnimation = new Animation( "Resources/AnimTest.fbx" );*/
 
 		Animator* SomeAnimator = GetApplication()->AddComponent< Animator >( GetObject() );
 		SomeAnimator->SetSkeleton( SomeSkeleton );
@@ -42,17 +46,16 @@ public:
 		SomeAnimator->Repeat( true );
 		SomeAnimator->SetPlaybackSpeed( 12.0f );
 		SomeAnimator->Play();
-		SomeAnimator->DebugEnabled( true );
+		SomeAnimator->DebugEnabled( false );
 
 		SomeMaterial = new Material();
 		SomeMaterial->SetShader( SomeShader );
 		SomeMaterial->SetTexture( SomeTextureDiffuse );
-		//SomeMaterial->SetTexture( SomeTextureNormal );
-		//SomeMaterial->SetTexture( SomeTextureSpecular );
-		
+
 		Renderer* SomeRenderer = GetApplication()->AddComponent< Renderer >( GetObject() );
 		SomeRenderer->SetMaterial( SomeMaterial );
 		SomeRenderer->SetMesh( SomeMesh );
+		SomeRenderer->SetEnabled( true );
 	}
 
 	void OnDestroy()
@@ -63,8 +66,6 @@ public:
 		delete SomeShader;
 		delete SomeMaterial;
 		delete SomeTextureDiffuse;
-		delete SomeTextureNormal;
-		delete SomeTextureSpecular;
 	}
 
 private:
@@ -75,6 +76,4 @@ private:
 	Shader*    SomeShader;
 	Material*  SomeMaterial;
 	Texture*   SomeTextureDiffuse;
-	Texture*   SomeTextureNormal;
-	Texture*   SomeTextureSpecular;
 };

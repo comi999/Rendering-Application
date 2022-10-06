@@ -1,7 +1,9 @@
 VERTEX_BEGIN
 #version 330
 
-#define MAX_BONE_COUNT 150
+//#define MAX_BONE_COUNT 106
+
+const int MAX_BONE_COUNT = 160;
 
 uniform mat4 u_PVM;
 uniform mat4 u_M;
@@ -14,7 +16,7 @@ layout( location = 2 ) in vec4 i_Tangent;
 layout( location = 3 ) in vec4 i_Bitangent;
 layout( location = 4 ) in vec2 i_Texel;
 layout( location = 5 ) in vec4 i_Colour;
-layout( location = 6 ) in ivec4 i_BoneIndices;
+layout( location = 6 ) in vec4 i_BoneIndices;
 layout( location = 7 ) in vec4 i_BoneWeights;
 
 out vec4 o_Position;
@@ -32,11 +34,22 @@ void main()
 	o_Bitangent = u_M * i_Bitangent;
 
 	gl_Position = u_PVM * (
-		u_Bones[ i_BoneIndices[ 0 ] ] * i_Position * i_BoneWeights[ 0 ] +
-		u_Bones[ i_BoneIndices[ 1 ] ] * i_Position * i_BoneWeights[ 1 ] +
-		u_Bones[ i_BoneIndices[ 2 ] ] * i_Position * i_BoneWeights[ 2 ] +
-		u_Bones[ i_BoneIndices[ 3 ] ] * i_Position * i_BoneWeights[ 3 ]
+		( u_Bones[ int( i_BoneIndices[ 0 ] ) ] * i_Position * i_BoneWeights[ 0 ] ) +
+		( u_Bones[ int( i_BoneIndices[ 1 ] ) ] * i_Position * i_BoneWeights[ 1 ] ) +
+		( u_Bones[ int( i_BoneIndices[ 2 ] ) ] * i_Position * i_BoneWeights[ 2 ] ) +
+		( u_Bones[ int( i_BoneIndices[ 3 ] ) ] * i_Position * i_BoneWeights[ 3 ] )
 	);
+
+	mat4 m = (
+		( u_Bones[ int( i_BoneIndices[ 0 ] ) ] * i_BoneWeights[ 0 ] ) +
+		( u_Bones[ int( i_BoneIndices[ 1 ] ) ] * i_BoneWeights[ 1 ] ) +
+		( u_Bones[ int( i_BoneIndices[ 2 ] ) ] * i_BoneWeights[ 2 ] ) +
+		( u_Bones[ int( i_BoneIndices[ 3 ] ) ] * i_BoneWeights[ 3 ] )
+	);
+
+	gl_Position = i_Position;
+	gl_Position.w = 1.0;
+	gl_Position = u_PVM * m * gl_Position;
 }
 VERTEX_END
 
@@ -110,7 +123,7 @@ void main()
 			}
 		}
 	}
-	
-	FragColour = SampleDiffuse * vec4( Accumulated, 1.0 );
+
+	FragColour = SampleDiffuse* vec4( Accumulated, 1.0 );
 }
 FRAGMENT_END

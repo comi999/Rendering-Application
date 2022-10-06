@@ -81,7 +81,7 @@ void Application::Run()
 		{
 			if ( !a_Animator.IsEnabled() ) return;
 
-			for ( uint32_t i = 1; i < a_Animator.GetSkeleton()->GetBoneCount(); ++i )
+			for ( uint32_t i = 0; i < a_Animator.GetSkeleton()->GetBoneCount(); ++i )
 			{
 				a_Animator.BuildMatrix( Rendering::AddBone(), i );
 			}

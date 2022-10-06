@@ -106,7 +106,7 @@ private:
 template < typename T >
 T* Application::AddComponent( Object a_Object )
 {
-	static bool Setup = []() 
+	static bool Setup = []()
 	{ 
 		AssureOnTick< T >();
 		AssureOnRender< T >();
@@ -116,6 +116,7 @@ T* Application::AddComponent( Object a_Object )
 	T* New = &m_Registry.emplace_or_replace< T >( a_Object );
 	New->m_Application = this;
 	New->m_Object = a_Object;
+	New->m_Enabled = true;
 
 	if constexpr ( HasOnCreate< T >::Value )
 	{

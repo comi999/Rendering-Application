@@ -162,7 +162,7 @@ void Rendering::Draw()
 						glVertexAttribPointer( 7, AI_MAX_BONE_WEIGHTS, GL_FLOAT, false, sizeof( Mesh::BoneWeights ), ( void* )0 );
 						glEnableVertexAttribArray( 7 );
 					} else glDisableVertexAttribArray( 7 );
-
+					
 					if ( s_MainMesh->GetIndices() )
 					{
 						glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, s_BufferHandles[ 8 ] );
@@ -202,7 +202,7 @@ void Rendering::Draw()
 				{
 					glBindVertexArray( s_ArrayHandle );
 					glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, s_BufferHandles[ 8 ] );
-					glDrawElements( GL_TRIANGLES, s_MainMesh->GetIndexCount(), GL_UNSIGNED_INT, ( void* )0 );
+					glDrawElements( ThisCall.RenderingMode, s_MainMesh->GetIndexCount(), GL_UNSIGNED_INT, ( void* )0 );
 					glBindVertexArray( 0 );
 					glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 					//glUseProgram( 0 );
@@ -212,7 +212,7 @@ void Rendering::Draw()
 				else if ( s_MainMesh )
 				{
 					glBindVertexArray( s_ArrayHandle );
-					glDrawArrays( GL_TRIANGLES, 0, s_MainMesh->GetVertexCount() );
+					glDrawArrays( ThisCall.RenderingMode, 0, s_MainMesh->GetVertexCount() );
 					glBindVertexArray( 0 );
 					//glUseProgram( 0 );
 				}

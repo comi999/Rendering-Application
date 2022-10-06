@@ -34,11 +34,6 @@ public:
 		SomeLight->Intensity = 3.0f;
 	}
 
-	void OnTick( float a_DeltaTime )
-	{
-
-	}
-
 	void OnDestroy()
 	{
 		GetApplication()->Destroy( m_Model0 );

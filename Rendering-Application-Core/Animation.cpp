@@ -19,11 +19,14 @@ Animation::Animation( const std::string& a_Path )
 	Skeleton AnimationSkeleton( a_Path );
 	m_TicksPerSecond = ThisAnimation->mTicksPerSecond;
 	m_Duration = ThisAnimation->mDuration;
-	m_Channels.resize( ThisAnimation->mNumChannels );
+	//m_Channels.resize( ThisAnimation->mNumChannels );
 
 	for ( uint32_t i = 0; i < ThisAnimation->mNumChannels; ++i )
 	{
-		auto& NewChannel = m_Channels[ i ];
+		if ( !AnimationSkeleton[ ThisAnimation->mChannels[ i ]->mNodeName.C_Str() ] )
+			continue;
+
+		auto& NewChannel = m_Channels.emplace_back();// m_Channels[ i ];
 		auto* ThisChannel = ThisAnimation->mChannels[ i ];
 		NewChannel.Name = ThisAnimation->mChannels[ i ]->mNodeName.C_Str();
 		NewChannel.BoneIndex = AnimationSkeleton[ NewChannel.Name ]->Index;

@@ -105,27 +105,26 @@ Mesh::Mesh( const std::string& a_Path )
 	if ( ThisMesh->HasBones() )
 	{
 		Skeleton MeshSkeleton( a_Path );
-		std::vector< uint32_t > BoneInfluenceCounts;
-		BoneInfluenceCounts.resize( ThisMesh->mNumVertices );
+
 		m_BoneIndices.resize( ThisMesh->mNumVertices );
 		m_BoneWeights.resize( ThisMesh->mNumVertices );
-		
+
 		for ( uint32_t i = 0; i < ThisMesh->mNumBones; ++i )
 		{
-			auto* Bone = ThisMesh->mBones[ i ];
-			
-			for ( uint32_t j = 0; j < Bone->mNumWeights; ++j )
-			{
-				uint32_t VertexIndex = Bone->mWeights[ j ].mVertexId;
-				auto& BoneInfluences = BoneInfluenceCounts[ VertexIndex ];
-				auto& BoneIndices = m_BoneIndices[ VertexIndex ];
-				auto& BoneWeights = m_BoneWeights[ VertexIndex ];
+			aiBone* ThisBone = ThisMesh->mBones[ i ];
 
-				if ( BoneInfluences < AI_MAX_BONE_WEIGHTS )
+			for ( uint32_t j = 0; j < ThisBone->mNumWeights; ++j )
+			{
+				const aiVertexWeight& ThisWeight = ThisBone->mWeights[ j ];
+
+				for ( uint32_t k = 0; k < AI_MAX_BONE_WEIGHTS; ++k )
 				{
-					BoneIndices[ BoneInfluences ] = MeshSkeleton[ Bone->mName.C_Str() ]->Index;
-					BoneWeights[ BoneInfluences ] = Bone->mWeights[ j ].mWeight;
-					++BoneInfluences;
+					if ( m_BoneWeights[ ThisWeight.mVertexId ][ k ] == 0.0f )
+					{
+						m_BoneIndices[ ThisWeight.mVertexId ][ k ] = MeshSkeleton[ ThisBone->mName.C_Str() ]->Index;
+						m_BoneWeights[ ThisWeight.mVertexId ][ k ] = ThisWeight.mWeight;
+						break;
+					}
 				}
 			}
 		}

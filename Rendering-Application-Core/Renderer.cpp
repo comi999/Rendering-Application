@@ -10,6 +10,7 @@ void Renderer::OnRender()
 	DrawCall ToSubmit;
 	ToSubmit.Mesh      = m_Mesh;
 	ToSubmit.Material  = m_Material;
+	ToSubmit.RenderingMode = RenderingMode_Triangle;
 	ToSubmit.Transform = ThisTransform->GetGlobal();
 
 	Rendering::Submit( ToSubmit );

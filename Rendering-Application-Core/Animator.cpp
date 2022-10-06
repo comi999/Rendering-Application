@@ -4,7 +4,8 @@
 #include "LineRenderer.hpp"
 
 Animator::Animator()
-	: m_IsPlaying( false )
+	: m_IsDebugEnabled( false )
+	, m_IsPlaying( false )
 	, m_IsRepeating( false )
 	, m_ElapsedTime( 0.0f )
 	, m_PlaybackSpeed( 1.0f )
@@ -31,9 +32,8 @@ void Animator::DebugEnabled( bool a_Enabled )
 void Animator::BuildMatrix( glm::mat4& o_BoneMatrix, uint32_t a_BoneIndex ) const
 {
 	o_BoneMatrix =
-		glm::inverse( GetApplication()->GetComponent< Transform >( GetObject() )->GetGlobal() ) *
-		m_BoneTransforms[ a_BoneIndex ]->GetGlobal() *
-		( *m_Skeleton )[ a_BoneIndex ]->Offset;
+		m_BoneTransforms[ a_BoneIndex ]->GetGlobal()
+		* ( *m_Skeleton )[ a_BoneIndex ]->Offset;
 }
 
 void Animator::SetSkeleton( const Skeleton* a_Skeleton )
@@ -79,7 +79,7 @@ void Animator::SetSkeleton( const Skeleton* a_Skeleton )
 
 			if ( ThisBone->Parent < 0 )
 			{
-				ThisTransform->AttachChild( NewTransform, false );
+				//ThisTransform->AttachChild( NewTransform, false );
 				continue;
 			}
 
@@ -105,6 +105,7 @@ void Animator::SetAnimation( const Animation* a_Animation )
 		m_AnimationChannelContexts.emplace_back( *( *m_Animation )[ i ] );
 	}
 }
+	/*float in = 0;*/
 
 void Animator::OnTick( float a_DeltaTime )
 {
@@ -146,12 +147,45 @@ void Animator::OnTick( float a_DeltaTime )
 		BoneTransform->SetRotation( Context.GetRotation() );
 		BoneTransform->SetScale( Context.GetScale() );
 
-		if ( m_IsDebugEnabled && i > 0 )
+		/*in += a_DeltaTime;
+		auto q = glm::identity< glm::quat >();
+		auto r = glm::rotate( q, in, glm::vec3( 1, 0, 0 ) );
+		BoneTransform->SetRotation( r );*/
+
+		if ( m_IsDebugEnabled )
 		{
-			const glm::mat4& GlobalTransform = BoneTransform->GetGlobal();
-			glm::vec3 Start = BoneTransform->GetParent()->GetGlobal()[ 3 ];
-			glm::vec3 End = BoneTransform->GetGlobal()[ 3 ];
-			GetApplication()->GetComponent< LineRenderer >( GetObject() )->SetStartEnd( Start, End );
+			//const glm::mat4& GlobalTransform = BoneTransform->GetGlobal();
+			//glm::vec3 Start;// = BoneTransform->GetParent()->GetGlobal()[ 3 ];
+			//glm::vec3 End;// = BoneTransform->GetGlobal()[ 3 ];
+
+			//glm::vec3 Scale;
+			//glm::quat Rotation;
+			//glm::vec3 Skew;
+			//glm::vec4 Perspective;
+
+			//glm::decompose(
+			//	BoneTransform->GetParent()->GetGlobal(),
+			//	Scale,
+			//	Rotation,
+			//	Start,
+			//	Skew,
+			//	Perspective
+			//);
+
+			//glm::decompose(
+			//	BoneTransform->GetGlobal(),
+			//	Scale,
+			//	Rotation,
+			//	End,
+			//	Skew,
+			//	Perspective
+			//);
+
+			//glm::mat4 Inv = glm::inverse( BoneTransform->GetParent()->GetGlobal() );
+
+			//LineRenderer* ThisLineRenderer = GetApplication()->GetComponent< LineRenderer >( BoneTransform->GetObject() );
+			//ThisLineRenderer->Start = Inv * glm::vec4( Start, 1.0f );
+			//ThisLineRenderer->End = Inv * glm::vec4( End, 1.0f );
 		}
 	}
 }

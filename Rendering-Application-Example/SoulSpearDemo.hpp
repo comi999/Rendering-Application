@@ -10,9 +10,6 @@
 #include "Renderer.hpp"
 #include "Transform.hpp"
 #include "Object.hpp"
-//#include "Skeleton.hpp"
-//#include "Animation.hpp"
-//#include "Animator.hpp"
 #include "ObjectRotator.hpp"
 
 class SoulSpearDemo : public Component

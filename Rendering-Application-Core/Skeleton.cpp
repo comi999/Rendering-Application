@@ -14,7 +14,7 @@ Skeleton::Skeleton( const std::string& a_Path )
 	: Resource( a_Path )
 {
 	Assimp::Importer Importer;
-	const aiScene* ThisScene = Importer.ReadFile( a_Path, 0 );
+	const aiScene* ThisScene = Importer.ReadFile( a_Path, aiPostProcessSteps::aiProcess_OptimizeGraph | aiPostProcessSteps::aiProcess_OptimizeMeshes );
 	aiMesh* ThisMesh = ThisScene->mMeshes[ 0 ];
 
 	std::list< std::pair< aiBone*, aiNode* > > ToSearch;
@@ -36,13 +36,19 @@ Skeleton::Skeleton( const std::string& a_Path )
 
 	std::map< std::string, Node > Dependencies;
 	Node* RootNode = nullptr;
-    uint32_t BoneCount = 0;
 
 	for ( auto& Pair : ToSearch )
 	{
 		aiNode* ThisNode = Pair.second;
+		Node* PrevNode = nullptr;
 
-		Node* PrevNode = &( Dependencies[ ThisNode->mName.C_Str() ] =
+		if ( Dependencies.find( ThisNode->mName.C_Str() ) != Dependencies.end() )
+		{
+			continue;
+		}
+
+		// Create a Node for this aiNode.
+		Node* NewNode = &( Dependencies[ ThisNode->mName.C_Str() ] =
 		{
 			Pair.first,
 			Pair.second,
@@ -50,41 +56,56 @@ Skeleton::Skeleton( const std::string& a_Path )
 			{}
 		} );
 
-        ++BoneCount;
-
-		do
+		// Search up the tree until either you hit the root node of the scene, or you find a node that's
+		// already been registered.
+		while ( true )
 		{
-            ThisNode = ThisNode->mParent;
-			auto Iter = Dependencies.find( ThisNode->mName.C_Str() );
-
-			if ( Iter != Dependencies.end() )
+			// If ThisNode's parent is null, then ThisNode is the RootNode.
+			if ( !ThisNode->mParent )
 			{
-				Iter->second.Children.push_back( PrevNode );
-				PrevNode->Parent = &Iter->second;
+				RootNode = NewNode;
 				break;
 			}
 
-			Node& NewNode = Dependencies[ ThisNode->mName.C_Str() ] =
+			// Store the NewNode as the previous and set ThisNode to it's parent.
+			PrevNode = NewNode;
+			ThisNode = ThisNode->mParent;
+
+			// First check if the ThisNode already registered.
+			auto Found = Dependencies.find( ThisNode->mName.C_Str() );
+
+			// If it is, then connect PrevNode as a child of the found Node and finish.
+			if ( Found != Dependencies.end() )
+			{
+				Found->second.Children.push_back( PrevNode );
+				PrevNode->Parent = &Found->second;
+				break;
+			}
+
+			// FOR TESTING ONLY - See if this is truly a bone, or a boneless node in the heirarchy.
+			/*auto Founded = std::find_if( ToSearch.begin(), ToSearch.end(), [&]( std::pair< aiBone*, aiNode* > n )
+			{
+				return n.first->mName == ThisNode->mName;
+			} );
+
+			if ( Founded == ToSearch.end() ) continue;*/
+
+			// If not, then create a new node for it.
+			NewNode = &( Dependencies[ ThisNode->mName.C_Str() ] =
 			{
 				nullptr,
 				ThisNode,
 				nullptr,
 				{}
-			};
+			} );
 
-            ++BoneCount;
-			NewNode.Children.push_back( PrevNode );
-			PrevNode->Parent = &NewNode;
-            PrevNode = &NewNode;
-			ThisNode = ThisNode->mParent;
-
-            if ( !ThisNode )
-            {
-                RootNode = &NewNode;
-            }
-
-        } while ( ThisNode );
+			// Set up it's relationship.
+			NewNode->Children.push_back( PrevNode );
+			PrevNode->Parent = NewNode;
+		}
 	}
+
+	uint32_t BoneCount = Dependencies.size();
 
     while ( RootNode && !RootNode->Bone )
     {
@@ -107,27 +128,22 @@ Skeleton::Skeleton( const std::string& a_Path )
 		
 		Utility::Convert( ThisNode->This->mTransformation, ThisBone.Local );
 		Utility::Convert( ThisNode->Bone ? ThisNode->Bone->mOffsetMatrix : aiMatrix4x4(), ThisBone.Offset );
+		//ThisBone.Offset = glm::mat4( 1.0f ); // glm::inverse( ThisBone.Offset );
 
+		// Calculate Offset
+		/*Node* Current = ThisNode;
+		glm::mat4 Offset( 1.0f );
 
-
-		if ( !ThisNode->Bone )
+		while ( Current != RootNode )
 		{
-			Node* Current = ThisNode;
 			glm::mat4 Local;
-
-			while ( Current != RootNode )
-			{
-				Utility::Convert( Current->This->mTransformation, Local );
-				ThisBone.Offset = Local * ThisBone.Offset;
-				Current = Current->Parent;
-			}
-
-			ThisBone.Offset = glm::inverse( ThisBone.Offset );
+			Utility::Convert( Current->This->mTransformation, Local );
+			Offset = Local * Offset;
+			Current = Current->Parent;
 		}
-		else
-		{
-			Utility::Convert( ThisNode->Bone->mOffsetMatrix, ThisBone.Offset );
-		}
+
+		ThisBone.Offset = glm::inverse( Offset );*/
+
 
 		for ( Node* Child : ThisNode->Children )
 		{

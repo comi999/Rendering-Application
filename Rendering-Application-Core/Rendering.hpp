@@ -14,11 +14,18 @@
 #define MAX_LIGHT_COUNT 4
 #define MAX_BONE_COUNT 300
 
+enum ERenderingMode : GLint
+{
+	RenderingMode_Triangle = GL_TRIANGLES,
+	RenderingMode_Line = GL_LINES
+};
+
 struct DrawCall
 {
 	Mesh* Mesh;
 	Material* Material;
 	glm::mat4 Transform;
+	ERenderingMode RenderingMode;
 };
 
 class Rendering
