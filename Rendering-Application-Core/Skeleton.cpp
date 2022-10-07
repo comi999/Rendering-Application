@@ -10,11 +10,25 @@
 #include "Skeleton.hpp"
 #include "Utilities.hpp"
 
+//void RecursiveAdd( aiNode* a_Node, uint32_t a_Parent, std::vector< Bone >& o_Bones )
+//{
+//	Bone& NewBone = o_Bones.emplace_back();
+//	NewBone.Name = a_Node->mName.C_Str();
+//	NewBone.Index = o_Bones.size() - 1u;
+//	NewBone.Parent = a_Parent;
+//	Utility::Convert( a_Node->mTransformation, NewBone.Local );
+//
+//	for ( uint32_t i = 0; i < a_Node->mNumChildren; ++i )
+//	{
+//		RecursiveAdd( a_Node->mChildren[ i ], NewBone.Index, o_Bones );
+//	}
+//}
+
 Skeleton::Skeleton( const std::string& a_Path )
 	: Resource( a_Path )
 {
 	Assimp::Importer Importer;
-	const aiScene* ThisScene = Importer.ReadFile( a_Path, aiPostProcessSteps::aiProcess_OptimizeGraph | aiPostProcessSteps::aiProcess_OptimizeMeshes );
+	const aiScene* ThisScene = Importer.ReadFile( a_Path, 0 );
 	aiMesh* ThisMesh = ThisScene->mMeshes[ 0 ];
 
 	std::list< std::pair< aiBone*, aiNode* > > ToSearch;
@@ -36,12 +50,14 @@ Skeleton::Skeleton( const std::string& a_Path )
 
 	std::map< std::string, Node > Dependencies;
 	Node* RootNode = nullptr;
+	Node* PrevNode = nullptr;
 
 	for ( auto& Pair : ToSearch )
 	{
 		aiNode* ThisNode = Pair.second;
-		Node* PrevNode = nullptr;
 
+		// This node could already be registered as part of a previous node's registration.
+		// If so, continue, don't bother.
 		if ( Dependencies.find( ThisNode->mName.C_Str() ) != Dependencies.end() )
 		{
 			continue;
@@ -82,14 +98,6 @@ Skeleton::Skeleton( const std::string& a_Path )
 				break;
 			}
 
-			// FOR TESTING ONLY - See if this is truly a bone, or a boneless node in the heirarchy.
-			/*auto Founded = std::find_if( ToSearch.begin(), ToSearch.end(), [&]( std::pair< aiBone*, aiNode* > n )
-			{
-				return n.first->mName == ThisNode->mName;
-			} );
-
-			if ( Founded == ToSearch.end() ) continue;*/
-
 			// If not, then create a new node for it.
 			NewNode = &( Dependencies[ ThisNode->mName.C_Str() ] =
 			{
@@ -106,12 +114,18 @@ Skeleton::Skeleton( const std::string& a_Path )
 	}
 
 	uint32_t BoneCount = Dependencies.size();
+	PrevNode = nullptr;
+	//Node* PrevNode2 = nullptr;
 
     while ( RootNode && !RootNode->Bone )
-    {
-        RootNode = RootNode->Children[ 0 ];
+	{
+		//PrevNode2 = PrevNode;
+		//PrevNode = RootNode;
+		RootNode = RootNode->Children[ 0 ];
         --BoneCount;
     }
+
+	//RootNode = PrevNode;
 
 	m_Bones.reserve( BoneCount );
 	std::queue< std::pair< Node*, int32_t > > NodeQueue;
@@ -127,23 +141,6 @@ Skeleton::Skeleton( const std::string& a_Path )
 		ThisBone.Parent = NodeQueue.front().second;
 		
 		Utility::Convert( ThisNode->This->mTransformation, ThisBone.Local );
-		Utility::Convert( ThisNode->Bone ? ThisNode->Bone->mOffsetMatrix : aiMatrix4x4(), ThisBone.Offset );
-		//ThisBone.Offset = glm::mat4( 1.0f ); // glm::inverse( ThisBone.Offset );
-
-		// Calculate Offset
-		/*Node* Current = ThisNode;
-		glm::mat4 Offset( 1.0f );
-
-		while ( Current != RootNode )
-		{
-			glm::mat4 Local;
-			Utility::Convert( Current->This->mTransformation, Local );
-			Offset = Local * Offset;
-			Current = Current->Parent;
-		}
-
-		ThisBone.Offset = glm::inverse( Offset );*/
-
 
 		for ( Node* Child : ThisNode->Children )
 		{
@@ -153,7 +150,89 @@ Skeleton::Skeleton( const std::string& a_Path )
 		m_Names[ ThisBone.Name ] = ThisBone.Index;
 		NodeQueue.pop();
 	}
+
+	m_Bones[ 0 ].Local = glm::mat4( 1.0f );
+	m_Bones[ 0 ].Offset = glm::mat4( 1.0f );
+
+	// Start at index 1, because 0 will always be reserved for the root bone.
+	for ( uint32_t i = 1; i < m_Bones.size(); ++i )
+	{
+		Bone& ThisBone = m_Bones[ i ];
+		Bone& ParentBone = m_Bones[ ThisBone.Parent ];
+
+		ThisBone.Offset = glm::inverse( glm::inverse( ParentBone.Offset ) * ThisBone.Local );
+	}
 }
+
+//Skeleton::Skeleton( const std::string& a_Path )
+//	: Resource( a_Path )
+//{
+//	Assimp::Importer Importer;
+//	const aiScene* ThisScene = Importer.ReadFile( a_Path, aiPostProcessSteps::aiProcess_OptimizeGraph | aiPostProcessSteps::aiProcess_OptimizeMeshes );
+//	aiMesh* ThisMesh = ThisScene->mMeshes[ 0 ];
+//
+//	std::list< std::pair< aiBone*, aiNode* > > ToSearch;
+//
+//	for ( uint32_t i = 0; i < ThisMesh->mNumBones; ++i )
+//	{
+//		aiBone* ThisBone = ThisMesh->mBones[ i ];
+//		aiNode* ThisNode = ThisScene->mRootNode->FindNode( ThisBone->mName );
+//		ToSearch.emplace_back( ThisBone, ThisNode );
+//	}
+//
+//	struct Node
+//	{
+//		aiBone* Bone;
+//		aiNode* This;
+//		Node* Parent;
+//		std::vector< Node* > Children;
+//	};
+//
+//	std::map< aiNode*, bool > Dependencies;
+//
+//	std::queue< aiNode* > ToAdd;
+//	ToAdd.push( ThisScene->mRootNode );
+//
+//	while ( !ToAdd.empty() )
+//	{
+//		aiNode* ThisToAdd = ToAdd.front();
+//		ToAdd.pop();
+//		Dependencies[ ThisToAdd ] = false;
+//
+//		for ( uint32_t i = 0; i < ThisToAdd->mNumChildren; ++i )
+//		{
+//			ToAdd.push( ThisToAdd->mChildren[ i ] );
+//		}
+//	}
+//
+//	aiNode* MeshNode = ThisScene->mRootNode->FindNode( ThisMesh->mName );
+//	aiNode* RootNode = nullptr;
+//
+//	for ( auto& Pair : ToSearch )
+//	{
+//		aiNode* PrevNode = nullptr;
+//		aiNode* ThisNode = Pair.second;
+//
+//		while ( ThisNode )
+//		{
+//			Dependencies[ ThisNode ] = true;
+//			PrevNode = ThisNode;
+//			ThisNode = ThisNode->mParent;
+//		}
+//	}
+//
+//	Bone& RootBone = m_Bones.emplace_back();
+//	RootBone.Name = "Root";
+//	RootBone.Index = 0;
+//	RootBone.Parent = -1;
+//	RootBone.Local = glm::mat4( 1.0f );
+//	RootBone.Offset = glm::mat4( 1.0f );
+//
+//	for ( aiNode* RootNode : RootSources )
+//	{
+//		RecursiveAdd( RootNode, 0, m_Bones );
+//	}
+//}
 
 void Skeleton::AddBone( const std::string& a_Name, int32_t a_Parent, const glm::mat4& a_Transform )
 {
