@@ -10,19 +10,24 @@
 #include "Skeleton.hpp"
 #include "Utilities.hpp"
 
-//void RecursiveAdd( aiNode* a_Node, uint32_t a_Parent, std::vector< Bone >& o_Bones )
-//{
-//	Bone& NewBone = o_Bones.emplace_back();
-//	NewBone.Name = a_Node->mName.C_Str();
-//	NewBone.Index = o_Bones.size() - 1u;
-//	NewBone.Parent = a_Parent;
-//	Utility::Convert( a_Node->mTransformation, NewBone.Local );
-//
-//	for ( uint32_t i = 0; i < a_Node->mNumChildren; ++i )
-//	{
-//		RecursiveAdd( a_Node->mChildren[ i ], NewBone.Index, o_Bones );
-//	}
-//}
+void RecursiveAdd( aiNode* a_Node, uint32_t a_Parent, const std::map< aiNode*, bool >& a_Dependencies, std::vector< Bone >& o_Bones )
+{
+	Bone& NewBone = o_Bones.emplace_back();
+	NewBone.Name = a_Node->mName.C_Str();
+	NewBone.Index = o_Bones.size() - 1u;
+	NewBone.Parent = a_Parent;
+	Utility::Convert( a_Node->mTransformation, NewBone.Local );
+
+	for ( uint32_t i = 0; i < a_Node->mNumChildren; ++i )
+	{
+		aiNode* ChildNode = a_Node->mChildren[ i ];
+
+		if ( a_Dependencies.find( ChildNode )->second )
+		{
+			RecursiveAdd( ChildNode, NewBone.Index, a_Dependencies, o_Bones );
+		}
+	}
+}
 
 //Skeleton::Skeleton( const std::string& a_Path )
 //	: Resource( a_Path )

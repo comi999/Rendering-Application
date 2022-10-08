@@ -33,9 +33,15 @@ public:
 		SomeSkeleton = new Skeleton( "Resources/Animation_Test.fbx" );
 		SomeAnimation = new Animation( "Resources/Animation_Test.fbx" );*/
 
+<<<<<<< HEAD
 		SomeMesh = new Mesh( "Resources/Taunt2.fbx" );
 		SomeSkeleton = new Skeleton( "Resources/Taunt2.fbx" );
 		SomeAnimation = new Animation( "Resources/Taunt2.fbx" );
+=======
+		SomeMesh = new Mesh( "Resources/Taunt.fbx" );
+		SomeSkeleton = new Skeleton( "Resources/Taunt.fbx" );
+		SomeAnimation = new Animation( "Resources/Taunt.fbx" );
+>>>>>>> aabaa0e46337a553df2d614a2856cabcfc469800
 
 		/*SomeMesh = new Mesh( "Resources/AnimTest.fbx" );
 		SomeSkeleton = new Skeleton( "Resources/AnimTest.fbx" );
