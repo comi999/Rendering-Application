@@ -36,6 +36,7 @@ public:
 		SomeMesh = new Mesh( "Resources/Taunt2.fbx" );
 		SomeSkeleton = new Skeleton( "Resources/Taunt2.fbx" );
 		SomeAnimation = new Animation( "Resources/Taunt2.fbx" );
+
 		/*SomeMesh = new Mesh( "Resources/AnimTest.fbx" );
 		SomeSkeleton = new Skeleton( "Resources/AnimTest.fbx" );
 		SomeAnimation = new Animation( "Resources/AnimTest.fbx" );*/
